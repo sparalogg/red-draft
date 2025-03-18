@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useDraft } from '../context/DraftContext';
 import { useSettings } from '../context/SettingsContext';
@@ -26,7 +26,9 @@ const { database } = require('../services/firebase');
 
 const DraftPage = () => {
   const { t } = useTranslation();
-  const { draftId } = useParams();
+  const location = useLocation();
+  const params = new URLSearchParams(location.search);
+  const draftId = params.get('d'); 
   const navigate = useNavigate();
   const { 
     state, 
@@ -436,18 +438,18 @@ const DraftPage = () => {
       <div className="draft-info">
         <div className="phase-indicator" id="phaseIndicator">
           {state.currentPhase === 'notStarted' 
-            ? 'In attesa di inizio'
+            ? t('draft.phase.waiting')
             : state.currentPhase === 'completed'
-              ? 'Draft Completato'
+              ? t('draft.phase.completed')
               : state.draftSequence[state.currentStepIndex]?.phase || ''}
         </div>
         <div className="draft-code-badge">
-          Codice Draft: <span className="draft-code">{draftId}</span>
+          {t('settings.code_draft')}: <span className="draft-code">{draftId}</span>
           {state.userTeam && (
             <span className={`user-team ${state.userTeam}-team`}>
-              {state.userTeam === 'blue' ? 'Team Blu' : 
-              state.userTeam === 'red' ? 'Team Rosso' : 
-              state.userTeam === 'admin' ? 'Admin' : 'Spettatore'}
+              {state.userTeam === 'blue' ? 'Team Blue' : 
+              state.userTeam === 'red' ? 'Team Red' : 
+              state.userTeam === 'admin' ? 'Admin' : 'Spectator'}
             </span>
           )}
         </div>

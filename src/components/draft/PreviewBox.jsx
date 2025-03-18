@@ -40,6 +40,23 @@ const PreviewBox = ({ team }) => {
     confirmSelection();
   };
 
+  const handleDeselectChampion = (championToDeselect) => {
+    // Trova l'indice del campione da deselezionare
+    const indexToRemove = currentSelections.findIndex(
+      selected => selected.id === championToDeselect.id
+    );
+  
+    if (indexToRemove !== -1) {
+      // Crea una nuova copia dell'array delle selezioni correnti
+      const updatedSelections = [...currentSelections];
+      updatedSelections.splice(indexToRemove, 1);
+  
+      // Usa la funzione selectChampion per aggiornare lo stato
+      // Passa null per rimuovere la selezione
+      selectChampion(championToDeselect, team);
+    }
+  };
+
   // Rendering del contenuto della preview
   const renderPreviewContent = () => {
     // Se non è il turno di questo team, mostra un messaggio di attesa
@@ -86,24 +103,37 @@ const PreviewBox = ({ team }) => {
         )}
         
         <div className="d-flex flex-wrap justify-content-center">
-          {currentSelections.map((selection, index) => (
-            <div 
-              key={index} 
-              className="m-2 text-center champion-preview-item"
-              style={{ cursor: 'default' }}
-            >
-              {selection && selection.image ? (
-                <img 
-                  src={selection.image.startsWith('/') ? selection.image : `/${selection.image}`} 
-                  alt={selection.name || 'Champion'} 
-                  style={{ height: '70px', display: 'block', margin: '0 auto' }} 
-                />
-              ) : (
-                <i className="fa-solid fa-user-ninja" style={{ fontSize: '2rem', display: 'block', margin: '0 auto' }}></i>
-              )}
-              <div className="fs-6 mt-1">{selection ? selection.name : 'Unknown'}</div>
-            </div>
-          ))}
+{currentSelections.map((selection, index) => (
+  <div 
+    key={index} 
+    className="m-2 text-center champion-preview-item"
+    onClick={() => selectChampion(selection, team)}
+    style={{ 
+      cursor: 'pointer',
+      // Aggiungi un effetto visivo simile a ChampionCard
+      transition: 'transform 0.2s ease',
+      transform: 'scale(1)',
+      opacity: 1
+    }}
+  >
+    {selection && selection.image ? (
+      <img 
+        src={selection.image.startsWith('/') ? selection.image : `/${selection.image}`} 
+        alt={selection.name || 'Champion'} 
+        style={{ 
+          height: '70px', 
+          display: 'block', 
+          margin: '0 auto',
+          // Effetti hover/selezione
+          transition: 'transform 0.2s ease'
+        }} 
+      />
+    ) : (
+      <i className="fa-solid fa-user-ninja" style={{ fontSize: '2rem', display: 'block', margin: '0 auto' }}></i>
+    )}
+    <div className="fs-6 mt-1">{selection ? selection.name : 'Unknown'}</div>
+  </div>
+))}
           
           {/* Mostra placeholder per selezioni rimanenti */}
           {isMultipleSelection && currentSelections.length < requiredSelections && (

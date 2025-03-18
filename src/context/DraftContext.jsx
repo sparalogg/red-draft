@@ -327,45 +327,46 @@ function draftReducer(state, action) {
         currentTimer: action.payload
       };
 
-    case ACTIONS.SELECT_CHAMPION: {
-      const { champion, team } = action.payload;
-      
-      if (!champion || !champion.id) {
-        console.warn("Invalid champion data:", champion);
-        return state;
-      }
-      
-      let newSelections = [...(state.currentSelections || [])];
-    
-      // Multiple selection handling
-      if (state.isMultipleSelectionStep) {
-        // Check if champion is already selected
+      case ACTIONS.SELECT_CHAMPION: {
+        const { champion, team } = action.payload;
+        
+        if (!champion || !champion.id) {
+          console.warn("Invalid champion data:", champion);
+          return state;
+        }
+        
+        let newSelections = [...(state.currentSelections || [])];
+        
+        // Cerca se il campione è già presente nelle selezioni correnti
         const existingIndex = newSelections.findIndex(c => c.id === champion.id);
         
         if (existingIndex >= 0) {
-          // If already selected, remove it (toggle selection)
+          // Se già selezionato, rimuovilo (toggle)
           newSelections.splice(existingIndex, 1);
         } else {
-          // If not selected and haven't reached limit, add it
-          if (newSelections.length < state.requiredSelections) {
-            newSelections.push(champion);
-          } else {
-            // If limit reached, remove oldest and add new
-            newSelections.shift();
-            newSelections.push(champion);
+          // Se non selezionato e non si tratta di una selezione multipla, sostituisci
+          if (!state.isMultipleSelectionStep) {
+            newSelections = [champion];
+          } 
+          // Per selezioni multiple
+          else {
+            // Se non hai raggiunto il limite, aggiungi
+            if (newSelections.length < state.requiredSelections) {
+              newSelections.push(champion);
+            } 
+            // Se hai raggiunto il limite, non fare nulla
+            else {
+              return state;
+            }
           }
         }
-      } else {
-        // Single selection, replace existing
-        newSelections = [champion];
+      
+        return {
+          ...state,
+          selectedChampion: champion,
+          currentSelections: newSelections
+        };
       }
-    
-      return {
-        ...state,
-        selectedChampion: champion,
-        currentSelections: newSelections
-      };
-    }
 
     case ACTIONS.CONFIRM_SELECTION: {
       const currentStep = state.draftSequence[state.currentStepIndex];
@@ -629,94 +630,127 @@ export function DraftProvider({ children, settings }) {
   ]);
 
 
-  const createDraft = async (championsData, blueTeamName = 'Blue Team', redTeamName = 'Red Team') => {
-    try {
-      await cleanupOldDrafts();
+  const createDraft = async (championsData, blueTeamName = 'Blue Team', redTeamName = 'Red Team') => {try {
+    await cleanupOldDrafts();
+    
+    const draftCode = generateDraftCode();
+    const draftRef = ref(database, `drafts/${draftCode}`);
+    const accessCodes = generateAccessCodes(draftCode);
+  
+    // Create a fully defined settings object
+    const completeSettings = {
+      // Default values from initialState.settings
+      timePerPick: 30,
+      timePerBan: 30,
+      numberOfBans: 2,
+      teamBonusTime: 30,
+      mirrorPicks: false,
+      startingTeam: 'coinFlip',
+      language: 'en',
+      disabledChampions: ['empty'],
       
-      const draftCode = generateDraftCode();
-      const draftRef = ref(database, `drafts/${draftCode}`);
-      const accessCodes = generateAccessCodes(draftCode);
-      
-      //console.log("Creazione draft con codici:", accessCodes);
-      
-      // Prepara lo stato iniziale (solo dati serializzabili)
-      const serializableState = {
-        currentPhase: initialState.currentPhase,
-        currentTeam: initialState.currentTeam,
-        currentTimer: state.settings.timePerPick,
-        isPaused: initialState.isPaused,
-        selectedChampions: initialState.selectedChampions,
-        bannedChampions: initialState.bannedChampions,
-        currentSelections: initialState.currentSelections,
-        requiredSelections: initialState.requiredSelections,
-        isMultipleSelectionStep: initialState.isMultipleSelectionStep,
-        draftSequence: initialState.draftSequence,
-        currentStepIndex: initialState.currentStepIndex,
-        draftId: draftCode,
-        disabledChampions: ['empty'],
-        startingTeam: 'coinFlip',
-        language: 'en',
-        slotSelections: initialState.slotSelections,
-        teamNames: {
-          blue: blueTeamName,
-          red: redTeamName
-        },
-        // Aggiunta dei codici nella struttura corretta
-        codes: {
-          admin_code: accessCodes.admin,
-          draft_code: draftCode,
-          team_blu_code: accessCodes.blue,
-          team_red_code: accessCodes.red
-        },
-        settings: state.settings,
-        createdAt: Date.now()
-      };
-      
-      // Se abbiamo ricevuto dati campioni, inizializza
-      if (championsData) {
-        serializableState.availableChampions = championsData.map(champion => champion.id);
-      }
-      
-      // Salva il draft su Firebase
-      await withRetry(() => set(draftRef, serializableState));
-      
-      // Crea record nella cronologia draft
-      const historyRef = ref(database, `draftHistory/${draftCode}`);
-      await withRetry(() => set(historyRef, {
-        draftId: draftCode,
-        createdAt: Date.now(),
-        status: 'active',
-        expiresAt: Date.now() + (24 * 60 * 60 * 1000), // 24 ore
-        teamNames: {
-          blue: blueTeamName,
-          red: redTeamName
-        },
-        // Aggiungi anche i codici nella cronologia
-        codes: {
-          admin_code: accessCodes.admin,
-          draft_code: draftCode,
-          team_blu_code: accessCodes.blue,
-          team_red_code: accessCodes.red
-        },
-        settings: state.settings
-      }));
-      
-      // Imposta l'ID del draft e il team utente
-      dispatch({ type: ACTIONS.SET_DRAFT_ID, payload: draftCode });
-      dispatch({ type: ACTIONS.SET_USER_TEAM, payload: 'admin' });
-      
-      return {
-        draftCode,
-        accessCodes,
-        teamNames: {
-          blue: blueTeamName,
-          red: redTeamName
-        }
-      };
-    } catch (error) {
-      console.error("Errore durante la creazione del draft:", error);
-      throw error;
+      // Merge with existing state settings, overriding defaults
+      ...state.settings
+    };
+  
+    // Validate and normalize settings
+    const normalizedSettings = {
+      timePerPick: Math.min(Math.max(completeSettings.timePerPick, 5), 120),
+      timePerBan: Math.min(Math.max(completeSettings.timePerBan, 5), 60),
+      numberOfBans: completeSettings.numberOfBans || 2,
+      teamBonusTime: Math.min(Math.max(completeSettings.teamBonusTime, 0), 300),
+      mirrorPicks: !!completeSettings.mirrorPicks,
+      startingTeam: completeSettings.startingTeam || 'coinFlip',
+      language: completeSettings.language || 'en',
+      disabledChampions: Array.isArray(completeSettings.disabledChampions) 
+        ? completeSettings.disabledChampions 
+        : ['empty']
+    };
+  
+    // Prepara lo stato iniziale (solo dati serializzabili)
+    const serializableState = {
+      currentPhase: initialState.currentPhase,
+      currentTeam: initialState.currentTeam,
+      currentTimer: normalizedSettings.timePerPick,
+      isPaused: initialState.isPaused,
+      selectedChampions: initialState.selectedChampions,
+      bannedChampions: initialState.bannedChampions,
+      currentSelections: initialState.currentSelections,
+      requiredSelections: initialState.requiredSelections,
+      isMultipleSelectionStep: initialState.isMultipleSelectionStep,
+      draftSequence: initialState.draftSequence,
+      currentStepIndex: initialState.currentStepIndex,
+      draftId: draftCode,
+      disabledChampions: normalizedSettings.disabledChampions,
+      startingTeam: normalizedSettings.startingTeam,
+      language: normalizedSettings.language,
+      slotSelections: initialState.slotSelections,
+      teamNames: {
+        blue: blueTeamName,
+        red: redTeamName
+      },
+      // Aggiunta dei codici nella struttura corretta
+      codes: {
+        admin_code: accessCodes.admin,
+        draft_code: draftCode,
+        team_blu_code: accessCodes.blue,
+        team_red_code: accessCodes.red
+      },
+      // Use the normalized settings
+      settings: normalizedSettings,
+      teamBonusTime: {
+        blue: normalizedSettings.teamBonusTime,
+        red: normalizedSettings.teamBonusTime
+      },
+      isUsingBonusTime: { blue: false, red: false },
+      createdAt: Date.now()
+    };
+  
+    // Se abbiamo ricevuto dati campioni, inizializza
+    if (championsData) {
+      serializableState.availableChampions = championsData.map(champion => champion.id);
     }
+  
+    // Salva il draft su Firebase
+    await withRetry(() => set(draftRef, serializableState));
+  
+    // Crea record nella cronologia draft
+    const historyRef = ref(database, `draftHistory/${draftCode}`);
+    await withRetry(() => set(historyRef, {
+      draftId: draftCode,
+      createdAt: Date.now(),
+      status: 'active',
+      expiresAt: Date.now() + (24 * 60 * 60 * 1000), // 24 ore
+      teamNames: {
+        blue: blueTeamName,
+        red: redTeamName
+      },
+      // Aggiungi anche i codici nella cronologia
+      codes: {
+        admin_code: accessCodes.admin,
+        draft_code: draftCode,
+        team_blu_code: accessCodes.blue,
+        team_red_code: accessCodes.red
+      },
+      settings: normalizedSettings
+    }));
+  
+    // Imposta l'ID del draft e il team utente
+    dispatch({ type: ACTIONS.SET_DRAFT_ID, payload: draftCode });
+    dispatch({ type: ACTIONS.SET_USER_TEAM, payload: 'admin' });
+  
+    return {
+      draftCode,
+      accessCodes,
+      teamNames: {
+        blue: blueTeamName,
+        red: redTeamName
+      }
+    };
+  } catch (error) {
+    console.error("Errore durante la creazione del draft:", error);
+    throw error;
+  }
   };
 
   // Metodo per unirsi a un draft esistente
@@ -1393,38 +1427,21 @@ const isChampionSelectable = (championId, isReusable) => {
 
   // Auto-selezione campione quando il timer scade
   const autoSelectChampion = (availableChampions) => {
-    /*console.log('Auto selecting champion', { 
-      availableChampions, 
-      currentTeam: state.currentTeam,
-      isMultipleSelectionStep: state.isMultipleSelectionStep,
-      requiredSelections: state.requiredSelections
-    });*/
-  
-    // Se non ci sono campioni disponibili, esci
-    if (!availableChampions || availableChampions.length === 0) {
-      console.error("Nessun campione disponibile per la selezione automatica");
-      return;
-    }
-    
+    // Controlla se ci sono selezioni correnti
     const currentTeam = state.currentTeam;
     const currentTeamBonusTime = state.teamBonusTime[currentTeam];
     const isUsingBonusTime = state.isUsingBonusTime?.[currentTeam] || false;
+    const requiredSelections = state.requiredSelections || 1;
   
-    // Controllo se il tempo è completamente esaurito
     const shouldAutoSelect = 
       (isUsingBonusTime && currentTeamBonusTime <= 0) || 
       (!isUsingBonusTime && state.currentTimer <= 0 && currentTeamBonusTime <= 0);
   
     if (shouldAutoSelect) {
-      //console.log(`Tempo esaurito per ${currentTeam}. Preparazione selezione automatica.`);
-      
-      // Numero di selezioni richieste in questo turno
-      const requiredSelections = state.requiredSelections || 1;
-      
-      // Prepara la selezione automatica
+      // Filtra i campioni disponibili e selezionabili
       const availableSelectableChampions = availableChampions.filter(champion => 
-        isChampionSelectable(champion.id, champion.isReusable) &&
-        !state.currentSelections.some(selected => selected.id === champion.id)
+        !state.settings?.disabledChampions?.includes(champion.id) &&
+        isChampionSelectable(champion.id, champion.isReusable)
       );
       
       // Se non ci sono campioni selezionabili, passa al prossimo step
@@ -1440,12 +1457,12 @@ const isChampionSelectable = (championId, isReusable) => {
         return;
       }
       
-      // Prepara un array per le selezioni multiple
-      const selectedChampions = [];
+      // Gestione selezioni multiple
+      let selectedChampions = [...state.currentSelections];
       
-      // Seleziona i campioni richiesti
-      for (let i = 0; i < requiredSelections; i++) {
-        // Filtra i campioni ancora disponibili
+      // Se ci sono meno selezioni del richiesto, aggiungi selezioni casuali
+      while (selectedChampions.length < requiredSelections) {
+        // Filtra i campioni ancora disponibili escludendo quelli già selezionati
         const remainingChampions = availableSelectableChampions.filter(champion => 
           !selectedChampions.some(selected => selected.id === champion.id)
         );
@@ -1457,9 +1474,6 @@ const isChampionSelectable = (championId, isReusable) => {
         const randomIndex = Math.floor(Math.random() * remainingChampions.length);
         const selectedChampion = remainingChampions[randomIndex];
         
-        // Aggiungi il campione selezionato
-        selectedChampions.push(selectedChampion);
-        
         // Dispatch della selezione
         dispatch({
           type: ACTIONS.SELECT_CHAMPION,
@@ -1468,6 +1482,9 @@ const isChampionSelectable = (championId, isReusable) => {
             team: currentTeam 
           }
         });
+        
+        // Aggiungi alla lista delle selezioni
+        selectedChampions.push(selectedChampion);
       }
       
       // Conferma la selezione

@@ -6,29 +6,11 @@ const QueryParamRedirect = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Ottieni i parametri dalla query string
-    const params = new URLSearchParams(location.search);
-    
-    // Verifica se sono presenti i parametri di quick-access
-    if (params.has('quick-access') && params.has('d') && params.has('r')) {
-      const draftId = params.get('d');
-      const accessCode = params.get('r');
-      
-      // Reindirizza alla rotta di quick-access
-      navigate(`/quick-access/${draftId}/${accessCode}`);
-    } else {
-      // Se non ci sono i parametri necessari, vai alla pagina principale
-      navigate('/');
-    }
+    // Non è necessario fare nulla dato che ora usiamo direttamente i parametri di query
+    // Questo componente potrebbe non essere più necessario
   }, [location, navigate]);
 
-  // Mostra un loader durante il redirect
-  return (
-    <div className="loading-container">
-      <div className="loading-spinner"></div>
-      <p>Redirecting...</p>
-    </div>
-  );
+  return null;
 };
 
 export default QueryParamRedirect;

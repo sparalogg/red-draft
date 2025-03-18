@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { I18nextProvider } from 'react-i18next';
 import i18n from './context/i18n';
 import { SettingsProvider } from './context/SettingsContext';
@@ -30,6 +30,29 @@ const App = () => {
     language: 'en'
   };
 
+  const MainRouteHandler = () => {
+    const location = useLocation();
+    const params = new URLSearchParams(location.search);
+    
+    // Gestisci accesso rapido
+    if (params.has('quick-access') && params.has('d') && params.has('r')) {
+      return <QuickAccessPage draftId={params.get('d')} accessCode={params.get('r')} />;
+    }
+    
+    // Gestisci pagina draft
+    if (params.has('d')) {
+      return <DraftPage />;
+    }
+    
+    // Gestisci pagina cronologia
+    if (params.has('history')) {
+      return <DraftHistoryPage />;
+    }
+    
+    // Default: login page
+    return <LoginPage />;
+  };
+
   // Gestione reindirizzamenti salvati da 404.html
   useEffect(() => {
     const redirect = sessionStorage.redirect;
@@ -56,19 +79,10 @@ const App = () => {
         <AuthProvider>
           <SettingsProvider initialSettings={defaultSettings}>
             <DraftProvider settings={defaultSettings}>
-              <Routes>
-                <Route path="/" element={<LoginPage />} />
-                <Route path="/draft/:draftId" element={<DraftPage />} />
-                <Route path="/history" element={<DraftHistoryPage />} />
-                <Route 
-                  path="/quick-access/:draftId/:accessCode" 
-                  element={<QuickAccessPage />} 
-                />
-                {/* Nuova rotta per gestire i parametri di query */}
-                <Route path="/" element={<QueryParamRedirect />} />
-                {/* Catch-all route come ultima opzione */}
-                <Route path="*" element={<Navigate to="/" replace />} />
-              </Routes>
+            <Routes>
+              <Route path="/" element={<MainRouteHandler />} />
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
             </DraftProvider>
           </SettingsProvider>
         </AuthProvider>

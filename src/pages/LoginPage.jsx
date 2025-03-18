@@ -62,7 +62,7 @@ const LoginPage = () => {
       const accessCode = params.get('r');
       
       // Reindirizza alla rotta di quick-access
-      navigate(`/quick-access/${draftId}/${accessCode}`);
+      navigate(`/?quick-access=true&d=${draftId}&r=${accessCode}`);
     }
   }, [location, navigate]);
 
@@ -159,7 +159,7 @@ const LoginPage = () => {
       }
       
       // Naviga al draft
-      navigate(`/draft/${draftCode}`);
+      navigate(`/?d=${draftCode}`);
       
     } catch (error) {
       setError(`Errore durante l'accesso al draft: ${error.message}`);
@@ -311,7 +311,7 @@ const LoginPage = () => {
               className='submit-btn predButton'
               onClick={() => {
                 sessionStorage.setItem('draftAccessCode', '');
-                navigate(`/draft/${createdDraft.draftCode}`);
+                navigate(`/?d=${createdDraft.draftCode}`);
               }}
             >
               <span className="predButtonSpan">View as Spectator</span>
@@ -326,7 +326,7 @@ const LoginPage = () => {
                     blue: createdDraft.teamNames.blue,
                     red: createdDraft.teamNames.red
                   }));
-                  navigate(`/draft/${createdDraft.draftCode}`);
+                  navigate(`/?d=${createdDraft.draftCode}`);
                 }}
               >
                 <span className="predButtonSpan">View as Admin</span>
@@ -464,6 +464,13 @@ const LoginPage = () => {
               />
             </div>
             
+            <div>
+              <small class="text-white">
+                Default settings: Coinf Flip, Pick Time 30 seconds, Ban Time 30 seconds, Bonus Time 30 seconds, No Mirror Picks, English language, 2 bans per team. 
+              </small>
+            </div>
+
+
             <div className="captcha-container">
               <ReCAPTCHA
                 sitekey="6Le0p-oqAAAAAKu_IiJqY9VGncAbu-nmhnAYM7vU"

@@ -108,7 +108,7 @@ const DraftHistoryPage = () => {
   const handleJoinDraft = async (draftId, role) => {
     try {
       await joinDraft(draftId, role, user.uid);
-      navigate(`/draft/${draftId}`);
+      navigate(`/?d=${draftId}`);
     } catch (error) {
       console.error('Errore durante il join al draft:', error);
       setError('Non è stato possibile accedere al draft.');

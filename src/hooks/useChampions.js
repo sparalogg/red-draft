@@ -33,13 +33,13 @@ export function useChampions() {
 
       // Add an empty champion at the beginning (can be selected multiple times)
       const championsWithEmpty = [
+        ...parsedChampions,
         {
           id: 'empty',
           name: 'Empty Champion',
           image: null,
           isReusable: true
-        },
-        ...parsedChampions
+        }
       ];
 
       setChampions(championsWithEmpty);
@@ -78,13 +78,13 @@ export function useChampions() {
       } else {
         // Add the empty champion
         newChampions = [
+          ...parsedData,
           {
             id: 'empty',
             name: 'Empty Champion',
             image: null,
             isReusable: true
-          },
-          ...parsedData
+          }
         ];
       }
 

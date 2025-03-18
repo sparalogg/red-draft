@@ -67,7 +67,7 @@ const ChampionGrid = ({ canSelect = true }) => {
             <div className="search-container">
               <input
                 type="text"
-                placeholder="Cerca..."
+                placeholder="Filter by name..."
                 value={searchQuery}
                 onChange={handleSearchChange}
                 className="search-input"
@@ -94,7 +94,7 @@ const ChampionGrid = ({ canSelect = true }) => {
             <ChampionCard key={champion.id} champion={champion} canSelect={canSelect} />
           ))
         ) : (
-          <div className="no-results">Nessun campione trovato</div>
+          <div className="find-no-results">Nessun campione trovato</div>
         )}
       </div>
     </div>

@@ -600,6 +600,7 @@ body {
   width: 100%;
 }
 
+
 .coin {
   width: 200px;
   height: 200px;
@@ -897,8 +898,8 @@ body {
   /* Modifica Colo */
   position: fixed;
   bottom: 20px;
-  left: 260px;
-  width: 500px;
+  left: 270px;
+  width: 520px;
   transform: translateX(-50%);
   background-color: rgba(0, 0, 0, 0.7);
   padding: 5px 10px;
@@ -1305,6 +1306,7 @@ div.form-text{
 
 div.modal-dialog{
   color: white;
+  min-width: 600px; /* Aumenta la larghezza massima */  
 }
 
 div.modal-header{

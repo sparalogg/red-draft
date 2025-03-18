@@ -3,6 +3,12 @@
       "blue": "Blu",
       "red": "Rosso"
     },
+    "roles": {
+      "blue": "Team Blu",
+      "red": "Team Rosso",
+      "admin": "Admin",
+      "spectator": "Spettatore"
+    },
     "draft": {
       "timer": "{{seconds}} secondi",
       "phase": {

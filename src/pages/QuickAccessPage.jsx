@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useDraft } from '../context/DraftContext';
 
 const QuickAccessPage = () => {
-  const { draftId, accessCode } = useParams();
+  const location = useLocation();
+  const params = new URLSearchParams(location.search);
+  const draftId = params.get('d');
+  const accessCode = params.get('r');
   const navigate = useNavigate();
   const { joinDraft } = useDraft();
   const [error, setError] = useState(null);
@@ -28,7 +31,7 @@ const QuickAccessPage = () => {
         await joinDraft(draftId, role);
 
         // Naviga alla pagina del draft
-        navigate(`/draft/${draftId}`);
+        navigate(`/?d=${draftId}`);
       } catch (err) {
         console.error('Quick access error:', err);
         setError('Unable to join draft. Check the link and try again.');

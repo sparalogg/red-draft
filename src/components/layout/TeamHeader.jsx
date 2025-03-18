@@ -57,8 +57,10 @@ const TeamHeader = ({ team, readOnly = false }) => {
     const bonusTime = state.teamBonusTime?.[team] || 0;
     const isUsingBonusTime = state.isUsingBonusTime?.[team] || false;
   
-    // Mostra l'indicatore se è in uso il tempo bonus o c'è tempo bonus rimanente
-    if (bonusTime > 0 || isUsingBonusTime) {
+    // Mostra l'indicatore se:
+    // 1. C'è tempo bonus rimanente, O
+    // 2. Si sta utilizzando il bonus time (anche se a 0)
+    //if (bonusTime > 0 || isUsingBonusTime) {
       return (
         <span 
           className={`bonus-time-indicator ${team}-bonus-time`}
@@ -68,9 +70,8 @@ const TeamHeader = ({ team, readOnly = false }) => {
           <small>{bonusTime}s</small>
         </span>
       );
-    }
-  
-    return null;
+    //}
+    //return null;
   };
 
   // Badge del team iniziale
