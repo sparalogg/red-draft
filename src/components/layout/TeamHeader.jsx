@@ -15,7 +15,7 @@ const TeamHeader = ({ team, readOnly = false }) => {
     if (newTeamName !== teamName) {
       setTeamName(newTeamName);
     }
-  }, [state.teamNames, team, t]);
+  }, [state.teamNames, team, t, teamName]);
 
   const bonusTime = state.teamBonusTime?.[team] || 0;
   
@@ -25,7 +25,10 @@ const TeamHeader = ({ team, readOnly = false }) => {
     state.draftSequence[0].team === team;
 
   // Determina se questo è il team attuale
-  const isCurrentTeam = state.currentTeam === team;
+  const isCurrentTeam = 
+    state.currentPhase !== 'notStarted' && 
+    state.currentPhase !== 'completed' && 
+    state.currentTeam === team;
 
   const handleDoubleClick = () => {
     if (!readOnly) {
@@ -57,21 +60,15 @@ const TeamHeader = ({ team, readOnly = false }) => {
     const bonusTime = state.teamBonusTime?.[team] || 0;
     const isUsingBonusTime = state.isUsingBonusTime?.[team] || false;
   
-    // Mostra l'indicatore se:
-    // 1. C'è tempo bonus rimanente, O
-    // 2. Si sta utilizzando il bonus time (anche se a 0)
-    //if (bonusTime > 0 || isUsingBonusTime) {
-      return (
-        <span 
-          className={`bonus-time-indicator ${team}-bonus-time`}
-          title={`Tempo bonus rimanente: ${bonusTime} secondi`}
-        >
-          <i className="fas fa-clock"></i>
-          <small>{bonusTime}s</small>
-        </span>
-      );
-    //}
-    //return null;
+    return (
+      <span 
+        className={`bonus-time-indicator ${team}-bonus-time`}
+        title={`Tempo bonus rimanente: ${bonusTime} secondi`}
+      >
+        <i className="fas fa-clock"></i>
+        <small>{bonusTime}s</small>
+      </span>
+    );
   };
 
   // Badge del team iniziale
@@ -108,7 +105,7 @@ const TeamHeader = ({ team, readOnly = false }) => {
   if (readOnly || !isEditing) {
     return (
       <div 
-        className={`team-header ${team}-header`}
+        className={`team-header ${team}-header ${isCurrentTeam ? 'active-turn' : ''}`}
         onDoubleClick={handleDoubleClick}
         title={readOnly ? "" : "Doppio click per modificare"}
         style={{ position: 'relative' }}
@@ -124,7 +121,7 @@ const TeamHeader = ({ team, readOnly = false }) => {
   return (
     <input
       type="text"
-      className={`team-header ${team}-header team-name-input`}
+      className={`team-header ${team}-header team-name-input ${isCurrentTeam ? 'active-turn' : ''}`}
       value={teamName}
       onChange={handleChange}
       onBlur={handleBlur}

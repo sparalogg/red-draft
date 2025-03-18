@@ -446,11 +446,11 @@ const DraftPage = () => {
         <div className="draft-code-badge">
           {t('settings.code_draft')}: <span className="draft-code">{draftId}</span>
           {state.userTeam && (
-            <span className={`user-team ${state.userTeam}-team`}>
+            <span className={`user-team ${state.userTeam}-team`}><center>
               {state.userTeam === 'blue' ? 'Team Blue' : 
               state.userTeam === 'red' ? 'Team Red' : 
               state.userTeam === 'admin' ? 'Admin' : 'Spectator'}
-            </span>
+            </center></span>
           )}
         </div>
       </div>

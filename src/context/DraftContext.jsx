@@ -38,7 +38,10 @@ const initialState = {
   currentTeam: 'blue',
   currentTimer: 30,
   isPaused: false,
+  coinFlipInProgress: false,
+  coinFlipResult: null,
   selectedChampion: null,
+  startingTeamChoice: null,
   startingTeam: 'coinFlip',
   selectedChampions: {
     blue: [],
@@ -178,10 +181,12 @@ function draftReducer(state, action) {
       };
 
       case ACTIONS.SET_COIN_FLIP_STATUS:
+        console.log("Reducer: SET_COIN_FLIP_STATUS", action.payload);
         return {
           ...state,
-          coinFlipInProgress: action.payload.inProgress,
-          coinFlipResult: action.payload.result
+          coinFlipInProgress: action.payload.inProgress, 
+          coinFlipResult: action.payload.result,
+          startingTeamChoice: action.payload.startingTeamChoice
         };
 
       case ACTIONS.UPDATE_TEAM_NAMES:
@@ -232,11 +237,11 @@ function draftReducer(state, action) {
             requiredSelections: action.payload.draftSequence[0].selectCount || 1,
             teamBonusTime: action.payload.teamBonusTime || { blue: 0, red: 0 },
             coinFlipInProgress: false,
-            coinFlipResult: null ,
+            coinFlipResult: null,
+            startingTeamChoice: null
           };
 
           case ACTIONS.RESET_DRAFT:
-            // Questo è un fallback utilizzato solo in caso di errore nel reset completo
             return {
               ...initialState,
               draftId: state.draftId,
@@ -245,12 +250,14 @@ function draftReducer(state, action) {
               codes: state.codes,
               settings: state.settings,
               createdAt: state.createdAt,
-              // Reinizializza il tempo bonus dalle impostazioni
               teamBonusTime: {
                 blue: state.settings?.teamBonusTime || 0,
                 red: state.settings?.teamBonusTime || 0
               },
               isUsingBonusTime: { blue: false, red: false },
+              coinFlipInProgress: false,
+              coinFlipResult: null,
+              startingTeamChoice: null,
               lastResetTimestamp: Date.now()
             };
 
@@ -328,7 +335,16 @@ function draftReducer(state, action) {
       };
 
       case ACTIONS.SELECT_CHAMPION: {
-        const { champion, team } = action.payload;
+        const { champion, team, multipleChampions } = action.payload;
+        
+        // Se abbiamo ricevuto selezioni multiple direttamente
+        if (multipleChampions && multipleChampions.length > 0) {
+          return {
+            ...state,
+            selectedChampion: multipleChampions[multipleChampions.length - 1],
+            currentSelections: multipleChampions
+          };
+        }
         
         if (!champion || !champion.id) {
           console.warn("Invalid champion data:", champion);
@@ -763,27 +779,36 @@ export function DraftProvider({ children, settings }) {
         throw new Error("Draft non trovato");
       }
       
-          // Aggiorna lo stato di presenza per questo utente
-    const presenceRef = ref(database, `drafts/${draftCode}/presence/${team}`);
-    await withRetry(() => set(presenceRef, Date.now()));
-    
-    // Configura un sistema per aggiornare la presenza periodicamente
-    const presenceInterval = setInterval(() => {
-      set(presenceRef, Date.now())
-        .catch(e => console.error("Errore aggiornamento presenza:", e));
-    }, 30000); // Aggiorna ogni 30 secondi
-    
-    // Configura la rimozione della presenza alla disconnessione
-    const onDisconnectRef = ref(database, `drafts/${draftCode}/presence/${team}`);
-    onDisconnect(onDisconnectRef).remove();
-    
-    // Salva l'intervallo per poterlo cancellare quando necessario
-    window.presenceInterval = presenceInterval;
-
+      // Aggiorna lo stato di presenza per questo utente
+      const presenceRef = ref(database, `drafts/${draftCode}/presence/${team}`);
+      await withRetry(() => set(presenceRef, Date.now()));
+      
+      // Configura un sistema per aggiornare la presenza periodicamente
+      const presenceInterval = setInterval(() => {
+        set(presenceRef, Date.now())
+          .catch(e => console.error("Errore aggiornamento presenza:", e));
+      }, 30000); // Aggiorna ogni 30 secondi
+      
+      // Configura la rimozione della presenza alla disconnessione
+      const onDisconnectRef = ref(database, `drafts/${draftCode}/presence/${team}`);
+      onDisconnect(onDisconnectRef).remove();
+      
+      // Salva l'intervallo per poterlo cancellare quando necessario
+      window.presenceInterval = presenceInterval;
+  
       // Imposta listener per aggiornamenti in tempo reale
       onValue(draftRef, (snapshot) => {
         const data = snapshot.val();
         if (data) {
+          // Log per debug - rimuovi in produzione
+          console.log("Firebase update received:", {
+            coinFlipInProgress: data.coinFlipInProgress,
+            coinFlipResult: data.coinFlipResult,
+            startingTeamChoice: data.startingTeamChoice,
+            currentPhase: data.currentPhase
+          });
+          
+          // Assicurati che i campi relativi al coinflip siano esplicitamente inclusi
           dispatch({ 
             type: ACTIONS.SET_DRAFT_STATE, 
             payload: {
@@ -800,14 +825,31 @@ export function DraftProvider({ children, settings }) {
               teamNames: {
                 blue: data.teamNames?.blue || state.teamNames.blue || 'Blue',
                 red: data.teamNames?.red || state.teamNames.red || 'Red'
-              }
+              },
+              // Aggiungi esplicitamente i campi del coinflip per assicurarti che vengano sincronizzati
+              coinFlipInProgress: data.coinFlipInProgress || false,
+              coinFlipResult: data.coinFlipResult || null,
+              startingTeamChoice: data.startingTeamChoice || null
             }
           });
-
+  
+          // Gestisci separatamente lo stato di pausa
           if (data.isPaused !== undefined) {
             dispatch({
               type: ACTIONS.SET_PAUSE_STATE,
               payload: data.isPaused
+            });
+          }
+          
+          // Gestisci separatamente lo stato del coinflip
+          if (data.coinFlipInProgress !== undefined || data.coinFlipResult !== undefined || data.startingTeamChoice !== undefined) {
+            dispatch({
+              type: ACTIONS.SET_COIN_FLIP_STATUS,
+              payload: {
+                inProgress: data.coinFlipInProgress || false,
+                result: data.coinFlipResult || null,
+                startingTeamChoice: data.startingTeamChoice || null
+              }
             });
           }
           
@@ -825,6 +867,7 @@ export function DraftProvider({ children, settings }) {
         dispatch({ type: ACTIONS.SET_USER_TEAM, payload: team });
       }
       
+      console.log(`Joined draft as team: ${team}`);
       return true;
     } catch (error) {
       console.error("Errore durante l'accesso al draft:", error);
@@ -832,58 +875,49 @@ export function DraftProvider({ children, settings }) {
     }
   };
 
-
-  
-
-  const setCoinFlipStatus = (inProgress, result = null) => {
+  const setCoinFlipStatus = (inProgress, result = null, startingTeamChoice = null) => {
     if (!state.draftId) return;
     
-    // Verifica che solo l'admin possa avviare il coin flip
-    if (inProgress && !result && state.userTeam !== 'admin') {
-      //console.log("Solo l'admin può avviare il coin flip");
-      return;
-    }
+    console.log("setCoinFlipStatus chiamato con:", { inProgress, result, startingTeamChoice });
     
-    //console.log(`${state.userTeam}: Aggiorno stato coin flip:`, { inProgress, result });
-    
-    // Aggiorna Firebase con un timestamp per assicurarsi che tutti ricevano l'aggiornamento
-    const draftRef = ref(database, `drafts/${state.draftId}`);
-    
-    const updates = {
-      coinFlipInProgress: inProgress,
-      coinFlipTimestamp: Date.now() // Timestamp per forzare l'aggiornamento
+    const updates = { 
+      coinFlipInProgress: inProgress, 
+      coinFlipResult: result,
+      coinFlipTimestamp: Date.now() 
     };
     
-    // Aggiungi il risultato se presente
-    if (result) {
-      updates.coinFlipResult = result;
+    // Aggiungi la scelta del team solo se specificata
+    if (startingTeamChoice !== null) {
+      updates.startingTeamChoice = startingTeamChoice;
     }
-    
-    // Non aggiungiamo più shouldStartDraft qui, sarà gestito dalla funzione startDraft
-    
-    withRetry(() => update(draftRef, updates)).catch(error => {
-      console.error("Errore nell'aggiornamento dello stato coin flip:", error);
-    });
-    
-    // Aggiorna lo stato locale
-    dispatch({
-      type: ACTIONS.SET_COIN_FLIP_STATUS,
-      payload: { inProgress, result }
-    });
+  
+    console.log("Aggiornamento Firebase coin flip:", updates);
+  
+    withRetry(() => update(ref(database, `drafts/${state.draftId}`), updates))
+      .then(() => {
+        console.log("Firebase aggiornato con successo");
+        
+        // Dispatch dell'azione
+        dispatch({ 
+          type: ACTIONS.SET_COIN_FLIP_STATUS, 
+          payload: { inProgress, result, startingTeamChoice } 
+        });
+      })
+      .catch(error => console.error("Errore aggiornamento coin flip:", error));
   };
-
 // Avvia il draft
+// Rimuovi una delle due implementazioni di startDraft, mantieni solo questa
 const startDraft = (startingTeam = null) => {
   if (!state.draftId) {
     console.error("Nessun draft selezionato");
     return;
   }
   
-  //console.log("startDraft chiamato con startingTeam:", startingTeam, "coinFlipInProgress:", state.coinFlipInProgress);
+  console.log("startDraft chiamato con startingTeam:", startingTeam);
   
-  // Blocca avvio per non-admin se siamo già in una fase attiva
-  if (state.currentPhase !== 'notStarted' && state.currentPhase !== 'completed' && state.userTeam !== 'admin') {
-    //console.log("Solo l'admin può avviare un draft già in corso");
+  // Verifica se il draft è già in corso (fase diversa da 'notStarted' o 'completed')
+  if (state.currentPhase !== 'notStarted' && state.currentPhase !== 'completed') {
+    console.log("Il draft è già in corso, ignorando avvio duplicato");
     return;
   }
   
@@ -891,10 +925,16 @@ const startDraft = (startingTeam = null) => {
   if (!startingTeam && state.settings.startingTeam === 'coinFlip' && !state.coinFlipInProgress) {
     // Solo l'admin può avviare il coin flip
     if (state.userTeam === 'admin') {
-      //console.log("Admin: Attivo coin flip per tutti");
-      setCoinFlipStatus(true, null);
+      console.log("Admin: Attivo coin flip per tutti");
+      setCoinFlipStatus(true, null, null);
       return; // Ritorna solo qui, quando attiviamo il coin flip
     }
+  }
+  
+  // Usa la scelta dal coinflip se disponibile e non è stato specificato un team iniziale
+  if (!startingTeam && state.startingTeamChoice) {
+    startingTeam = state.startingTeamChoice;
+    console.log("Usando la scelta dal coinflip:", startingTeam);
   }
   
   // Determina il team iniziale
@@ -914,7 +954,7 @@ const startDraft = (startingTeam = null) => {
     }
   }
   
-  //console.log("Avvio draft con team finale:", effectiveStartingTeam);
+  console.log("Avvio draft con team finale:", effectiveStartingTeam);
   
   // Genera la sequenza e avvia il draft
   const draftSequence = generateDraftSequence({
@@ -941,7 +981,8 @@ const startDraft = (startingTeam = null) => {
     isMultipleSelectionStep: draftSequence[0].multiSelect || false,
     requiredSelections: draftSequence[0].selectCount || 1,
     coinFlipInProgress: false,
-    coinFlipResult: effectiveStartingTeam // Manteniamo il risultato per riferimento
+    coinFlipResult: null,
+    startingTeamChoice: null // Resetta anche la scelta quando avviamo il draft
   };
 
   // Aggiorna lo stato locale
@@ -1425,84 +1466,103 @@ const isChampionSelectable = (championId, isReusable) => {
     }
   };
 
-  // Auto-selezione campione quando il timer scade
-  const autoSelectChampion = (availableChampions) => {
-    // Controlla se ci sono selezioni correnti
+  const autoSelectChampion = async (availableChampions) => {
     const currentTeam = state.currentTeam;
     const currentTeamBonusTime = state.teamBonusTime[currentTeam];
     const isUsingBonusTime = state.isUsingBonusTime?.[currentTeam] || false;
     const requiredSelections = state.requiredSelections || 1;
+    const userTeam = state.userTeam;
+    const isAdmin = userTeam === 'admin';
+    const isSpectator = !['blue', 'red', 'admin'].includes(userTeam);
+    const teamPresence = state.teamPresence || {}; // Stato di presenza del team
   
+    // Se si è spettatori, non fare nulla
+    if (isSpectator) return;
+  
+    // Se il team attuale è connesso, l'admin non deve intervenire
+    if (isAdmin && teamPresence[currentTeam]) return;
+  
+    // Verifica se è necessario effettuare l'autoselect
     const shouldAutoSelect = 
       (isUsingBonusTime && currentTeamBonusTime <= 0) || 
       (!isUsingBonusTime && state.currentTimer <= 0 && currentTeamBonusTime <= 0);
   
     if (shouldAutoSelect) {
+      // Verifica se l'autoselect è già stato eseguito su Firebase
+      const draftRef = ref(database, `drafts/${state.draftId}/autoSelectTriggered`);
+      const snapshot = await get(draftRef);
+      if (snapshot.exists() && snapshot.val()) {
+        console.warn("Autoselect già eseguito, evitando doppia esecuzione");
+        return;
+      }
+      await set(draftRef, true); // Segna l'autoselect come eseguito
+  
       // Filtra i campioni disponibili e selezionabili
       const availableSelectableChampions = availableChampions.filter(champion => 
         !state.settings?.disabledChampions?.includes(champion.id) &&
         isChampionSelectable(champion.id, champion.isReusable)
       );
       
-      // Se non ci sono campioni selezionabili, passa al prossimo step
       if (availableSelectableChampions.length === 0) {
         console.warn('Nessun campione selezionabile rimanente');
-        dispatch({ 
-          type: ACTIONS.MOVE_TO_NEXT_STEP,
-          payload: {
-            timePerBan: state.settings.timePerBan,
-            timePerPick: state.settings.timePerPick
-          }
-        });
+        dispatch({ type: ACTIONS.MOVE_TO_NEXT_STEP, payload: {
+          timePerBan: state.settings.timePerBan,
+          timePerPick: state.settings.timePerPick
+        }});
         return;
       }
+  
+      // Inizia con i campioni già selezionati nella preview box
+      let selectedChampions = [...(state.currentSelections || [])];
       
-      // Gestione selezioni multiple
-      let selectedChampions = [...state.currentSelections];
+      // Se abbiamo già più selezioni del necessario, prendiamo solo le prime requiredSelections
+      if (selectedChampions.length > requiredSelections) {
+        selectedChampions = selectedChampions.slice(0, requiredSelections);
+      }
       
-      // Se ci sono meno selezioni del richiesto, aggiungi selezioni casuali
+      // Aggiungi campioni casuali finché non raggiungiamo il numero richiesto
       while (selectedChampions.length < requiredSelections) {
-        // Filtra i campioni ancora disponibili escludendo quelli già selezionati
-        const remainingChampions = availableSelectableChampions.filter(champion => 
+        // Filtra i campioni non ancora selezionati
+        const remainingSelectableChampions = availableSelectableChampions.filter(champion => 
           !selectedChampions.some(selected => selected.id === champion.id)
         );
         
-        // Se non ci sono più campioni, interrompi
-        if (remainingChampions.length === 0) break;
+        if (remainingSelectableChampions.length === 0) {
+          console.warn('Non ci sono abbastanza campioni selezionabili per completare la selezione multipla');
+          break;
+        }
         
-        // Seleziona un campione casuale
-        const randomIndex = Math.floor(Math.random() * remainingChampions.length);
-        const selectedChampion = remainingChampions[randomIndex];
+        // Seleziona un campione casuale tra quelli rimanenti
+        const randomIndex = Math.floor(Math.random() * remainingSelectableChampions.length);
+        const randomChampion = remainingSelectableChampions[randomIndex];
         
-        // Dispatch della selezione
-        dispatch({
-          type: ACTIONS.SELECT_CHAMPION,
-          payload: { 
-            champion: selectedChampion, 
-            team: currentTeam 
-          }
-        });
-        
-        // Aggiungi alla lista delle selezioni
-        selectedChampions.push(selectedChampion);
+        selectedChampions.push(randomChampion);
       }
       
-      // Conferma la selezione
-      dispatch({ 
-        type: ACTIONS.CONFIRM_SELECTION 
-      });
-      
-      // Passa al prossimo step
-      dispatch({ 
-        type: ACTIONS.MOVE_TO_NEXT_STEP,
-        payload: {
-          timePerBan: state.settings.timePerBan,
-          timePerPick: state.settings.timePerPick
+      // Aggiorna lo stato con tutte le selezioni
+      dispatch({
+        type: ACTIONS.SELECT_CHAMPION,
+        payload: { 
+          champion: selectedChampions[selectedChampions.length - 1], // Per compatibilità
+          team: currentTeam,
+          multipleChampions: selectedChampions // Nuovo campo per selezione multipla
         }
       });
+      
+      // Aspetta un momento per mostrare le selezioni prima di confermare
+      setTimeout(() => {
+        dispatch({ type: ACTIONS.CONFIRM_SELECTION });
+        dispatch({ type: ACTIONS.MOVE_TO_NEXT_STEP, payload: {
+          timePerBan: state.settings.timePerBan,
+          timePerPick: state.settings.timePerPick
+        }});
+        
+        // Resetta il flag su Firebase dopo la conferma
+        setTimeout(() => set(draftRef, false), 1000);
+      }, 200);
     }
   };
-  
+
 
   return (
     <DraftContext.Provider

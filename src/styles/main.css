@@ -157,6 +157,7 @@ body {
   color: white;
   border: none;
   outline: none;
+  z-index: 5;
   width: 25%;
       /* border-bottom: 1px dashed #fff; */
       cursor: text;
@@ -892,14 +893,31 @@ body {
   color: white;
 }
 
+
+.team-header.active-turn {
+  animation: team-header-pulse 2s infinite alternate;
+  box-shadow: 0 0 15px gold;
+  border-width: 3px;
+}
+
+@keyframes team-header-pulse {
+  from {
+    box-shadow: 0 0 5px gold;
+  }
+  to {
+    box-shadow: 0 0 35px gold;
+  }
+}
+
+
 /* Phase Indicator */
 .draft-info {
   position: absolute;
   /* Modifica Colo */
   position: fixed;
   bottom: 20px;
-  left: 270px;
-  width: 520px;
+  left: 280px;
+  width: 540px;
   transform: translateX(-50%);
   background-color: rgba(0, 0, 0, 0.7);
   padding: 5px 10px;
@@ -1182,6 +1200,7 @@ body {
   color: white;
   font-weight: bold;
   border-radius: 5px;
+  z-index: 10;
   transition: background-color 0.3s ease;
 }
 
