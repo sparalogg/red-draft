@@ -1,0 +1,258 @@
+/* Stili per la pagina di storia dei draft */
+.history-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: var(--mid-bg);
+    min-height: 100vh;
+    color: white;
+  }
+  
+  .history-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #444;
+  }
+  
+  .tabs {
+    display: flex;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    overflow: hidden;
+  }
+  
+  .tab-btn {
+    flex: 1;
+    padding: 12px;
+    background-color: #2d3748;
+    border: none;
+    color: #cbd5e0;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  
+  .tab-btn.active {
+    background-color: #4a5568;
+    color: white;
+  }
+  
+  .draft-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+  }
+  
+  .draft-card {
+    background-color: var(--darker-bg);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s;
+  }
+  
+  .draft-card:hover {
+    transform: translateY(-5px);
+  }
+  
+  .draft-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    background-color: rgba(0, 0, 0, 0.2);
+  }
+  
+  .draft-code {
+    margin: 0;
+    font-size: 1.2rem;
+  }
+  
+  .badge {
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: bold;
+  }
+  
+  .bg-success {
+    background-color: #10b981;
+  }
+  
+  .bg-primary {
+    background-color: #3b82f6;
+  }
+  
+  .bg-info {
+    background-color: #06b6d4;
+  }
+  
+  .bg-secondary {
+    background-color: #6b7280;
+  }
+  
+  .bg-warning {
+    background-color: #f59e0b;
+  }
+  
+  .bg-dark {
+    background-color: #1f2937;
+  }
+  
+  .draft-card-details {
+    padding: 15px;
+  }
+  
+  .detail-group {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+  }
+  
+  .detail-label {
+    color: #9ca3af;
+  }
+  
+  .detail-value {
+    color: white;
+    font-weight: 500;
+  }
+  
+  .draft-card-actions {
+    display: flex;
+    justify-content: space-between;
+    padding: 15px;
+    background-color: rgba(0, 0, 0, 0.15);
+  }
+  
+  .btn {
+    padding: 8px 16px;
+    border-radius: 5px;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  .btn-primary {
+    background-color: #3b82f6;
+    color: white;
+  }
+  
+  .btn-primary:hover:not(:disabled) {
+    background-color: #2563eb;
+  }
+  
+  .btn-danger {
+    background-color: #ef4444;
+    color: white;
+  }
+  
+  .btn-danger:hover:not(:disabled) {
+    background-color: #dc2626;
+  }
+  
+  .btn-sm {
+    padding: 6px 12px;
+    font-size: 0.85rem;
+  }
+  
+  .btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  
+  .empty-state {
+    text-align: center;
+    padding: 50px 20px;
+    background-color: rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    color: #9ca3af;
+  }
+  
+  .loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 50px 0;
+  }
+  
+  .spinner {
+    border: 4px solid rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    border-top: 4px solid white;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+    margin-bottom: 20px;
+  }
+  
+  .info-box {
+    background-color: rgba(59, 130, 246, 0.1);
+    border-left: 4px solid #3b82f6;
+    padding: 15px;
+    margin-top: 30px;
+    border-radius: 5px;
+  }
+  
+  .info-box h4 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: #60a5fa;
+  }
+  
+  /* Stili per la schermata di utente */
+  .user-info {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 10px;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+  }
+  
+  .user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+    object-fit: cover;
+  }
+  
+  .user-details {
+    flex: 1;
+  }
+  
+  .user-name {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 3px;
+  }
+  
+  .logout-link {
+    background: none;
+    border: none;
+    color: #60a5fa;
+    padding: 0;
+    font-size: 0.85rem;
+    cursor: pointer;
+    text-decoration: underline;
+  }
+  
+  @media (max-width: 768px) {
+    .draft-list {
+      grid-template-columns: 1fr;
+    }
+    
+    .history-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+    }
+  }

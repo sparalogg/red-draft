@@ -1,0 +1,458 @@
+/* Stili per le funzionalità multiplayer */
+
+/* Badge del codice draft */
+.draft-code-badge {
+    
+    bottom: 10px;
+    right: 10px;
+    background-color: rgba(0, 0, 0, 0.1);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .draft-code {
+    font-weight: bold;
+    background-color: #4a5568;
+    padding: 2px 6px;
+    border-radius: 4px;
+    letter-spacing: 1px;
+  }
+  
+  .user-team {
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: bold;
+  }
+  
+  .user-team.blue-team {
+    background-color: var(--blue-team);
+  }
+  
+  .user-team.red-team {
+    background-color: var(--red-team);
+  }
+  
+  .user-team.admin-team {
+    background-color: #6b21a8;
+  }
+  
+  /* Schermata di caricamento */
+  .loading-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: var(--darker-bg);
+    color: white;
+  }
+  
+  .loading-spinner {
+    border: 4px solid rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    border-top: 4px solid white;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+    margin-bottom: 20px;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  
+
+  .champions-grid-container {
+    position: relative;
+  }
+  
+  .spectator-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+  }
+  
+  .spectator-overlay .spectator-message {
+    display: none;
+    background-color: #ffffff3b;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    max-width: 300px;
+  }
+  
+  .champions-grid.spectator-mode {
+    pointer-events: none;
+    opacity: 0.75;
+  }
+  
+  .champion-card.spectator-mode {
+    cursor: not-allowed;
+  }
+  
+  .spectator-badge {
+    position: absolute;
+    top: 10px;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .champion-card.spectator-mode:hover::after {
+    content: 'Modalità Spettatore';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    z-index: 10;
+  }
+
+  
+  /* Schermata di errore */
+  .error-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: var(--darker-bg);
+    padding: 20px;
+  }
+  
+  .error-card {
+    background-color: var(--mid-bg);
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    width: 100%;
+    max-width: 500px;
+    padding: 30px;
+    text-align: center;
+    color: white;
+  }
+  
+  .error-card h2 {
+    color: #ef4444;
+    margin-bottom: 15px;
+  }
+  
+  /* Stile per bottoni disabilitati */
+  .btn-draft:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  
+  /* Badge che indica il turno attuale */
+  .current-turn-badge {
+    margin-left: 10px;
+    margin-right: 10px;
+    background-color: #25a65b;
+    color: white;
+    padding: 5px 8px;
+    border-radius: 15px;
+    font-size: 0.7rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+  }
+  
+  .current-turn-badge i {
+    font-size: 1rem;
+  }
+  
+  /* Evidenzia il team attivo */
+  .team-panel.active-team {
+    box-shadow: inset 0 0 15px rgba(255, 215, 0, 0.3);
+  }
+
+  .predButton{
+    width: 200px;
+    max-width: 50%;
+    margin:auto;
+    border:2px solid gold;
+    background-color: transparent;
+    height: 45px;
+    padding: 0px;
+    border-radius: 0px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.2s ease;
+  }
+  .predButtonMini{
+    width: 175px;
+    max-width: 50%;
+    margin:auto;
+    border:2px solid gold;
+    background-color: transparent;
+    height: 35px;
+    padding: 0px;
+    border-radius: 0px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.2s ease;
+  }
+  .predButton:hover{
+    width: 190px;
+    filter:brightness(1.2);
+  }
+  .predButtonMini:hover{
+    width: 165px;
+    filter:brightness(1.2);
+  }
+  
+  .predButtonSpan{
+    width: 190px;
+    height: 100%;
+    display:flex;
+    justify-content: center;
+    align-items: center;
+    color: black;
+    background: rgb(231,197,6);
+    background-color: linear-gradient(135deg, rgba(231,197,6,1) 0%, rgba(232,157,6,1) 100%);
+    background-image: url('https://www.predecessorgame.com/_next/image?url=%2Fstatic%2Fimages%2Fbg-cta.png&w=640&q=75');
+    background-size: 200%;
+    background-position: center;
+  }
+  .predButtonMiniSpan{
+    width: 165px;
+    height: 100%;
+    display:flex;
+    justify-content: center;
+    align-items: center;
+    color: black;
+    background: rgb(231,197,6);
+    background-color: linear-gradient(135deg, rgba(231,197,6,1) 0%, rgba(232,157,6,1) 100%);
+    background-image: url('https://www.predecessorgame.com/_next/image?url=%2Fstatic%2Fimages%2Fbg-cta.png&w=640&q=75');
+    background-size: 200%;
+    background-position: center;
+  }
+
+  button.predPauseButton{
+    background-image: url('https://www.predecessorgame.com/_next/image?url=%2Fstatic%2Fimages%2Fbg-cta.png&w=640&q=75');
+    background-size: 100%;
+    background-position: center;
+    background-color: linear-gradient(135deg, rgba(231,197,6,1) 0%, rgba(232,157,6,1) 100%);
+    color: black;
+    transition: all 0.2s ease;
+    position: relative;
+    clip-path: polygon(100% 0%, 90% 100%, 100% 100%, 0% 100%, 0% 0%);
+    padding: 0;
+  }
+  button.predPauseButton:hover{
+    filter: brightness(1.2);
+  }
+  
+  button.predResetButton{
+    background-image: url('https://www.predecessorgame.com/_next/image?url=%2Fstatic%2Fimages%2Fbg-cta.png&w=640&q=75');
+    background-size: 100%;
+    background-position: center;
+    background-color: linear-gradient(135deg, rgba(231,197,6,1) 0%, rgba(232,157,6,1) 100%);
+    color: black;
+    transition: all 0.2s ease;
+    position: relative;
+    clip-path: polygon(100% 0%, 100% 100%, 0% 100%, 10% 0%, 0% 0%);
+    padding: 0;
+  }
+  button.predResetButton:hover{
+    filter: brightness(1.2);
+  }
+
+  .middleBox{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 50%;
+    position: relative;
+  }
+
+  .draft-logo{
+    max-width: 16%;
+  }
+
+  .team-header{
+    border:2px solid gold;
+    border-radius: 0px;
+    margin-top: 5px;
+  }
+
+  .blue-header{
+    background-image: url("https://www.predecessorgame.com/_next/image?url=%2Fstatic%2Fimages%2Fbg-cta.png&w=640&q=75");
+    background-size: 100%;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+
+  .red-header{
+    background-image: url("https://www.predecessorgame.com/_next/image?url=%2Fstatic%2Fimages%2Fbg-cta.png&w=640&q=75");
+    background-size: 100%;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+
+  .lock-button{
+    margin-top: 10px;
+  }
+
+  .team-column.blue-column{
+    border: 1px solid gold;
+    border-radius: 0px;
+  }
+
+  .team-column.red-column{
+    border: 1px solid gold;
+    border-radius: 0px;
+  }
+
+  .controls{
+    background: var(--dark-bg);
+    background: transparent;
+    z-index: 2;
+  }
+
+  .champions-column{
+    /* background: var(--dark-bg); */
+    background: transparent;
+  }
+
+  .phase-section{
+    margin: auto;
+    margin-top: 5px;
+  }
+
+  .timer-header{
+    border-radius: 0px;
+  }
+
+  .blue-column{
+    background: #1d3259;
+  }
+
+  .red-column{
+    background: #482726;
+  }
+
+  #settingsBtn{
+    background-color: lightgray;
+    background-image: url('https://www.predecessorgame.com/_next/image?url=%2Fstatic%2Fimages%2Fbg-cta.png&w=640&q=75');
+    background-size: 200%;
+    background-position: center;
+    background-repeat: no-repeat;
+    color: #0f131e;
+    border: 2px solid #0f131e;
+    transition: all 0.2s ease;
+    border-radius: 0;
+    width: 190px;
+    height: 100%;
+  }
+
+  #settingsBtn:hover{
+    background-color: #0f131e;
+    color: lightgray;
+  }
+
+  #exitBtn{
+    background-color: red;
+    background-image: url('https://www.predecessorgame.com/_next/image?url=%2Fstatic%2Fimages%2Fbg-cta.png&w=640&q=75');
+    background-size: 200%;
+    background-position: center;
+    background-repeat: no-repeat;
+    color: lightgray;
+    border: 2px solid red;
+    transition: all 0.2s ease;
+    border-radius: 0;
+    width: 190px;
+    height: 100%;
+  }
+
+  #exitBtn:hover{
+    background-color: lightgray;
+    color: red;
+  }
+
+  #startBtn{
+    z-index: 2;
+    margin-top: 1em;
+  }
+
+  /* CHAMPIONS GRID FILTERS */
+
+  .champions-grid-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .filter-buttons {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  
+  .filter-btn {
+    padding: 0px 12px;
+    border: 2px solid #555;
+    background: #222;
+    color: white;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: all 0.3s;
+  }
+  
+  .filter-btn.active {
+    background: #0a74da;
+    border-color: #0a74da;
+  }
+  
+  .filter-btn:hover {
+    background: #0d5cac;
+  }
+  
+  .champions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 10px;
+    width: 100%;
+    max-width: 915px;
+  }
+  
+  .spectator-mode {
+    /*opacity: 0.5;*/
+  }
+  
+  .find-no-results{
+    width: 100%;
+    color: white;
+    font-size: 18px;
+    padding: 2px;
+    text-align: center;
+    font-weight: bold;
+    background-color: #0f131e72;
+  }

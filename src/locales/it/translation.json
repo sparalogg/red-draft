@@ -1,0 +1,107 @@
+{
+    "teams": {
+      "blue": "Blu",
+      "red": "Rosso"
+    },
+    "draft": {
+      "timer": "{{seconds}} secondi",
+      "phase": {
+        "notStarted": "Draft non iniziato",
+        "completed": "Draft completato",
+        "waiting": "In attesa di inizio",
+        "inProgress": "Draft in corso",
+        "paused": "Draft in pausa",
+        "ban": "Ban - Squadra {{team}}",
+        "pick": "Pick - Squadra {{team}}",
+        "multiplePick": "Pick ({{count}} Eroi) - Squadra {{team}}"
+      },
+      "slots": {
+        "player": "Slot Player",
+        "ban": "Slot Ban"
+      },
+      "emptyChampion": "PG Vuoto",
+      "selectHero": "Seleziona un eroe"
+    },
+    "settings": {
+      "title": "Impostazioni Draft",
+      "timePerPick": "Tempo di selezione (secondi)",
+      "timePerBan": "Tempo di ban (secondi)",
+      "numberOfBans": "Numero di ban per squadra",
+      "mirrorPicks": "Consenti mirror picks",
+      "starterTeam": "Primo Team",
+      "starterTeam_coinFlip": "Lancio moneta",
+      "starterTeam_blue": "Inizia Team Blu",
+      "starterTeam_red": "Inizia Team Red",
+      "mirrorPicksDesc": "Consenti la selezione di campioni già scelti",
+      "close": "Chiudi",
+      "save": "Salva impostazioni",
+      "accesscodes": "Codici di Accesso",
+      "code_draft": "Codice Draft",
+      "code_draft_admin": "Codice Admin",
+      "code_draft_blue": "Codice Blue Team",
+      "code_draft_red": "Codice Red Team",
+      "name_team_red": "Nome Team Rosso",
+      "name_team_blu": "Nome Team Blu",
+      "campioni_disabilitati": "Campioni Disabilitati",
+      "info_campioni1": "Tieni premuto Ctrl (o Cmd su Mac) per selezionare più campioni.",
+      "info_campioni2": "Il campione vuoto è disabilitato per default ma può essere reso disponibile."
+    },
+    "buttons": {
+      "start": "INIZIA DRAFT",
+      "newDraft": "NUOVO DRAFT",
+      "pause": "Pausa",
+      "resume": "Riprendi",
+      "reset": "Reset",
+      "settings": "Impostazioni",
+      "configChampions": "Config Campioni",
+      "lock": "Lock Selezione"
+    },
+    "confirmations": {
+      "resetDraft": "Sei sicuro di voler resettare il draft?"
+    },
+    "coinflip": {
+      "name": "Lancio della Moneta",
+      "startinfo": "Clicca sulla moneta per lanciare"
+    },
+    "instruction": {
+      "title": "ISTRUZIONI DI DRAFT",
+      "draftSequence": {
+        "1ban": {
+          "title": "Sequenza di Draft (1 Ban)",
+          "steps": [
+            "Ban iniziali: Prima Blu, poi Rosso",
+            "Prima fase pick: Blu → Rosso → Rosso → Blu → Blu → Rosso",
+            "Seconda fase pick: Rosso → Blu → Blu → Rosso"
+          ]
+        },
+        "2ban": {
+          "title": "Sequenza di Draft (2 Ban)",
+          "steps": [
+            "Ban iniziali: Prima Blu, poi Rosso",
+            "Prima fase pick: Blu → Rosso → Rosso → Blu → Blu → Rosso",
+            "Ban secondari: Rosso, poi Blu",
+            "Seconda fase pick: Rosso → Blu → Blu → Rosso"
+          ]
+        },
+        "3ban": {
+          "title": "Sequenza di Draft (3 Ban)",
+          "steps": [
+            "Ban iniziali: Prima Blu, poi Rosso",
+            "Prima fase pick: Blu → Rosso → Rosso → Blu → Blu → Rosso",
+            "Ban secondari: Rosso → Blu → Blu → Rosso",
+            "Seconda fase pick: Rosso → Blu → Blu → Rosso"
+          ]
+        }
+      },
+      "specialFeatures": {
+        "title": "Funzionalità Speciali",
+        "features": [
+          "Il PG Vuoto (primo personaggio nella griglia) può essere selezionato più volte",
+          "Il timer si può mettere in pausa e riprendere con l'apposito pulsante",
+          "Se il timer scade, verrà selezionato automaticamente un personaggio casuale tra quelli disponibili",
+          "Mirror Picks Attivo: I personaggi già selezionati non sono più disponibili per la selezione successiva anche per la squadra nemica"
+        ]
+      },
+      "footer": "powered by Sparalo_ & DoctorColo"
+    }
+  }

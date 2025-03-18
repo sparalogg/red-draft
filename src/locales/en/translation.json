@@ -1,0 +1,108 @@
+{
+    "teams": {
+      "blue": "Blue",
+      "red": "Red"
+    },
+    "draft": {
+      "timer": "{{seconds}} seconds",
+      "phase": {
+        "notStarted": "Draft Not Started",
+        "completed": "Draft Completed",
+        "waiting": "Waiting to Begin",
+        "inProgress": "Draft in Progress",
+        "paused": "Draft Paused",
+        "ban": "Ban - {{team}} Team",
+        "pick": "Pick - {{team}} Team",
+        "multiplePick": "Pick ({{count}} Heroes) - {{team}} Team"
+      },
+      "slots": {
+        "player": "Player Slot",
+        "ban": "Ban Slot"
+      },
+      "emptyChampion": "Empty Champion",
+      "selectHero": "Select a hero"
+    },
+    "settings": {
+      "title": "Draft Settings",
+      "timePerPick": "Time per pick (seconds)",
+      "timePerBan": "Time per ban (seconds)",
+      "numberOfBans": "Number of bans per team",
+      "mirrorPicks": "Allow mirror picks",
+      "starterTeam": "Frist Team",
+      "starterTeam_coinFlip": "Coin flip",
+      "starterTeam_blue": "Start Team Blu",
+      "starterTeam_red": "Start Team Red",
+      "mirrorPicksDesc": "Allow same champion to be selected by both teams",
+      "close": "Close",
+      "save": "Save Settings",
+      "accesscodes": "Access Codes",
+      "code_draft": "Draft Code",
+      "code_draft_admin": "Admin Code",
+      "code_draft_blue": "Blue Team Code",
+      "code_draft_red": "Red Team Code",
+      "name_team_red": "Team Red Name",
+      "name_team_blu": "Team Blue Name",
+      "campioni_disabilitati": "Disabled Champions",
+      "info_campioni1": "Hold down Ctrl (or Cmd on Mac) to select multiple samples.",
+      "info_campioni2": "The empty sample is disabled by default but can be made available.",
+      "teamBonusTime": "Team Bonus Time (seconds)"
+    },
+    "coinflip": {
+      "name": "Coin Flip",
+      "startinfo": "Click on the coin to flip"
+    },
+    "buttons": {
+      "start": "START DRAFT",
+      "newDraft": "NEW DRAFT",
+      "pause": "Pause",
+      "resume": "Resume",
+      "reset": "Reset",
+      "settings": "Settings",
+      "configChampions": "Configure Champions",
+      "lock": "Lock Selection"
+    },
+    "confirmations": {
+      "resetDraft": "Are you sure you want to reset the draft?"
+    },
+    "instruction": {
+      "title": "DRAFT INSTRUCTIONS",
+      "draftSequence": {
+        "1ban": {
+          "title": "Draft Sequence (1 Ban)",
+          "steps": [
+            "Initial Bans: First Blue, then Red",
+            "First pick phase: Blue → Red → Red → Blue → Blue → Red",
+            "Second pick phase: Red → Blue → Blue → Red"
+          ]
+        },
+        "2ban": {
+          "title": "Draft Sequence (2 Bans)",
+          "steps": [
+            "Initial Bans: First Blue, then Red",
+            "First pick phase: Blue → Red → Red → Blue → Blue → Red",
+            "Secondary Bans: Red, then Blue",
+            "Second pick phase: Red → Blue → Blue → Red"
+          ]
+        },
+        "3ban": {
+          "title": "Draft Sequence (3 Bans)",
+          "steps": [
+            "Initial Bans: First Blue, then Red",
+            "First pick phase: Blue → Red → Red → Blue → Blue → Red",
+            "Secondary Bans: Red → Blue → Blue → Red",
+            "Second pick phase: Red → Blue → Blue → Red"
+          ]
+        }
+      },
+      "specialFeatures": {
+        "title": "Special Features",
+        "features": [
+          "The Empty Champion (first in the grid) can be selected multiple times",
+          "The timer can be paused and resumed with the pause button",
+          "If the timer expires, a random available champion will be selected automatically",
+          "Mirror Picks Active: Champions already selected are no longer available for subsequent selection even by the enemy team"
+        ]
+      },
+      "footer": "powered by Sparalo_ & DoctorColo"
+    }
+  }
