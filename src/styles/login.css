@@ -477,11 +477,13 @@ body{
   position: absolute;
   width: 100vw;
   height: 100vh;
-  overflow: hidden; /* Nasconde solo l'immagine fuoriuscente */
+  overflow: hidden; /* Nasconde solo l'immagine */
   z-index:1;
   display:flex;
   justify-content: center;
   align-items: center;
+  user-select: none;
+  pointer-events: none;
 }
 
 .createdLoginTitle{
@@ -498,4 +500,57 @@ body{
   margin: 0;
   margin-top:10px;
   margin-bottom:10px;
+}
+
+.partnerSection{
+  position: absolute;
+  bottom: 0em;
+  right: 0em;
+  z-index: 0;
+  width: fit-content;
+  height: fit-content;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.partnerTitle{
+  text-align: center;
+}
+
+.partnerLogo{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.logo{
+  max-width: 90%;
+}
+
+.parazombiesLink{
+  outline: none;
+  border: none;
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  /* color: white; */
+  color: var(--mid-bg);
+  margin: 5px;
+}
+
+.parazombiesLink span{
+  /* background: var(--mid-bg);
+  box-shadow: 0 0 24px gold;
+  border: 1px solid gold; */
+  padding: 5px;
+  border-radius: 10px;
+}
+
+.parazombiesLink span svg{
+  display: flex;
+  margin: auto;
 }

@@ -1,0 +1,39 @@
+  
+  .wrapper-tilt {
+    padding: 15px; /* set the distance here */
+  }
+  
+  .card-tilt {
+    width: 125px;
+    height: 125px;
+    background-color: var(--mid-bg);
+    background-position: center;
+    background-size: contain;
+    background-repeat: no-repeat;
+    border-radius: 10px;
+    perspective: 1000px;
+    perspective-origin: 50% 50%;
+    transform-style: preserve-3d;
+    filter: drop-shadow(0 0 0.75rem #ccccff);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 0 24px gold;
+  border: 1px solid gold;
+  }
+  
+  .card-tilt:hover {
+    transform: rotateX(0deg) rotateY(0deg);
+    transition: transform 0.5s;
+  }
+
+  div.card-tilt span{
+    margin: auto;
+    font-size: 2em;
+    color: white;
+    font-weight: 600;
+    -webkit-text-stroke: 1px var(--mid-bg); /* Border width and color */
+    text-align: center;
+  }
+
