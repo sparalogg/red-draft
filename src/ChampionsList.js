@@ -241,18 +241,24 @@ export const defaultChampionsFile = `[
     },
     {
         "id": 41,
+        "name": "Wukong",
+        "image": "images/Champions/wukong.png",
+        "roles": ["jungle"]
+    },
+    {
+        "id": 42,
         "name": "Yurei",
         "image": "images/Champions/Yurei.png",
         "roles": ["jungle", "offlane"]
     },
     {
-        "id": 42,
+        "id": 43,
         "name": "Zarus",
         "image": "images/Champions/Zarus.png",
         "roles": ["offlane", "jungle"]
     },
     {
-        "id": 43,
+        "id": 44,
         "name": "Zinx",
         "image": "images/Champions/Zinx.jpg",
         "roles": ["support"]
