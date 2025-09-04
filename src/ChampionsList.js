@@ -169,105 +169,102 @@ export const defaultChampionsFile = `[
     },
     {
         "id": 29,
+        "name": "Renna",
+        "image": "images/Champions/Renna.png",
+        "roles": ["midlane"]
+    },
+    {
+        "id": 30,
         "name": "Revenant",
         "image": "images/Champions/Revenant.png",
         "roles": ["adc"]
     },
     {
-        "id": 30,
+        "id": 31,
         "name": "Riktor",
         "image": "images/Champions/Riktor.png",
         "roles": ["support", "offlane"]
     },
     {
-        "id": 31,
+        "id": 32,
         "name": "Serath",
         "image": "images/Champions/Serath.png",
         "roles": ["jungle", "offlane"]
     },
     {
-        "id": 32,
+        "id": 33,
         "name": "Sevarog",
         "image": "images/Champions/Sevarog.png",
         "roles": ["offlane", "jungle"]
     },
     {
-        "id": 33,
+        "id": 34,
         "name": "Shinbi",
         "image": "images/Champions/Shinbi.png",
         "roles": ["offlane", "jungle"]
     },
     {
-        "id": 34,
+        "id": 35,
         "name": "Skylar",
         "image": "images/Champions/Skylar.png",
         "roles": ["adc"]
     },
     {
-        "id": 35,
+        "id": 36,
         "name": "Sparrow",
         "image": "images/Champions/Sparrow.png",
         "roles": ["adc"]
     },
     {
-        "id": 36,
+        "id": 37,
         "name": "Steel",
         "image": "images/Champions/Steel.png",
         "roles": ["support", "offlane"]
     },
     {
-        "id": 37,
+        "id": 38,
         "name": "Terra",
         "image": "images/Champions/Terra.jpg",
         "roles": ["offlane", "jungle"]
     },
     {
-        "id": 38,
+        "id": 39,
         "name": "The Fey",
         "image": "images/Champions/TheFey.png",
         "roles": ["midlane"]
     },
     {
-        "id": 39,
+        "id": 40,
         "name": "TwinBlast",
         "image": "images/Champions/TwinBlast.png",
         "roles": ["adc"]
     },
     {
-        "id": 40,
+        "id": 41,
         "name": "Wraith",
         "image": "images/Champions/Wraith.png",
         "roles": ["adc", "midlane"]
     },
     {
-        "id": 41,
+        "id": 42,
         "name": "Yin",
         "image": "images/Champions/Yin.png",
         "roles": ["jungle"]
     },
     {
-<<<<<<< HEAD
-=======
-        "id": 41,
-        "name": "Wukong",
-        "image": "images/Champions/wukong.png",
-        "roles": ["jungle"]
-    },
-    {
->>>>>>> 91a358ae69752111bb7a2c1c35730b94fd8ac410
-        "id": 42,
+        "id": 43,
         "name": "Yurei",
         "image": "images/Champions/Yurei.png",
         "roles": ["jungle", "offlane"]
     },
     {
-        "id": 43,
+        "id": 44,
         "name": "Zarus",
         "image": "images/Champions/Zarus.png",
         "roles": ["offlane", "jungle"]
     },
     {
-        "id": 44,
+        "id": 45,
         "name": "Zinx",
         "image": "images/Champions/Zinx.jpg",
         "roles": ["support"]
