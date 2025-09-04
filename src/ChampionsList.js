@@ -246,6 +246,15 @@ export const defaultChampionsFile = `[
         "roles": ["jungle"]
     },
     {
+<<<<<<< HEAD
+=======
+        "id": 41,
+        "name": "Wukong",
+        "image": "images/Champions/wukong.png",
+        "roles": ["jungle"]
+    },
+    {
+>>>>>>> 91a358ae69752111bb7a2c1c35730b94fd8ac410
         "id": 42,
         "name": "Yurei",
         "image": "images/Champions/Yurei.png",
