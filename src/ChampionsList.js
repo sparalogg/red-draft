@@ -235,36 +235,42 @@ export const defaultChampionsFile = `[
     },
     {
         "id": 40,
+        "name": "Wukong",
+        "image": "images/Champions/wukong.png",
+        "roles": ["jungle"]
+    },
+    {
+        "id": 41,
         "name": "TwinBlast",
         "image": "images/Champions/TwinBlast.png",
         "roles": ["adc"]
     },
     {
-        "id": 41,
+        "id": 42,
         "name": "Wraith",
         "image": "images/Champions/Wraith.png",
         "roles": ["adc", "midlane"]
     },
     {
-        "id": 42,
+        "id": 43,
         "name": "Yin",
         "image": "images/Champions/Yin.png",
         "roles": ["jungle"]
     },
     {
-        "id": 43,
+        "id": 44,
         "name": "Yurei",
         "image": "images/Champions/Yurei.png",
         "roles": ["jungle", "offlane"]
     },
     {
-        "id": 44,
+        "id": 45,
         "name": "Zarus",
         "image": "images/Champions/Zarus.png",
         "roles": ["offlane", "jungle"]
     },
     {
-        "id": 45,
+        "id": 46,
         "name": "Zinx",
         "image": "images/Champions/Zinx.jpg",
         "roles": ["support"]
