@@ -21,30 +21,33 @@ const Timer = () => {
   // Modifica la funzione getTimerClasses per includere la classe 'completed'
   const getTimerClasses = () => {
     const baseClass = 'timer-header';
-    
-    // Se il draft è completato, aggiungi la classe 'completed'
+    let teamClass = '';
+    if (state.currentPhase !== 'completed' && state.currentPhase !== 'notStarted') {
+      teamClass = state.currentTeam === 'blue' ? 'team-blue' : (state.currentTeam === 'red' ? 'team-red' : '');
+    }
     if (phaseType === 'completed') {
       return `${baseClass} completed`;
     }
-    
-    // Altrimenti, mantieni la logica esistente
     if (currentTimer <= 5) {
-      return `${baseClass} danger`;
+      return `${baseClass} danger ${teamClass}`;
     } else if (currentTimer <= 10) {
-      return `${baseClass} warning`;
+      return `${baseClass} warning ${teamClass}`;
     }
-    
-    return baseClass;
+    return `${baseClass} ${teamClass}`;
   };
 
   return (
     <div id="timer" className={getTimerClasses()}>
       <div className="timer-content">
-        <i className="fa-solid fa-clock me-2"></i>
+        <i className={`fa-solid fa-clock me-2 team-${state.currentTeam}`}></i>
         {phaseType === 'ban' ? (
-          <span>Ban: {t('draft.timer', { seconds: currentTimer })}</span>
+          <span className={`ban-pick-text team-${state.currentTeam}`}>
+            Ban: {t('draft.timer', { seconds: currentTimer })}
+          </span>
         ) : phaseType === 'pick' ? (
-          <span>Pick: {t('draft.timer', { seconds: currentTimer })}</span>
+          <span className={`ban-pick-text team-${state.currentTeam}`}>
+            Pick: {t('draft.timer', { seconds: currentTimer })}
+          </span>
         ) : (
           <span>{t(`draft.phase.${phaseType}`)}</span>
         )}

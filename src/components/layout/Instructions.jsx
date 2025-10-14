@@ -57,7 +57,7 @@ const Instructions = () => {
           onClick={toggleInstructions}
         >
           <span className="text-warning btn-draft">
-            <i class="fa-solid fa-circle-info"></i>Show  {t('instruction.title')} {isExpanded ? '▲' : '▼'}
+            <i className="fa-solid fa-circle-info"></i>Show  {t('instruction.title')} {isExpanded ? '▲' : '▼'}
           </span>
         </div>
       </div>

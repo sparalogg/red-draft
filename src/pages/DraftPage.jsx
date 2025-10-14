@@ -259,9 +259,9 @@ const DraftPage = () => {
         const loadingDiv = document.createElement('div');
         loadingDiv.className = 'global-loading';
         loadingDiv.innerHTML = `
-          <div class="global-loading-backdrop"></div>
-          <div class="global-loading-content">
-            <div class="global-loading-spinner"></div>
+          <div className="global-loading-backdrop"></div>
+          <div className="global-loading-content">
+            <div className="global-loading-spinner"></div>
             <p>Reset in progress...</p>
           </div>
         `;
