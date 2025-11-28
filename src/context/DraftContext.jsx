@@ -1044,16 +1044,21 @@ const cleanupOldDrafts = async () => {
   }
 };
 
-// Aggiungi questo al tuo useEffect nel DraftProvider o in un componente di livello superiore
+// Esegui la pulizia una sola volta al mount, senza retry periodico
 useEffect(() => {
-  // Esegui la pulizia quando il componente viene montato
-  cleanupOldDrafts();
-
-  // Opzionale: imposta un intervallo per controllare periodicamente
-  const cleanupInterval = setInterval(cleanupOldDrafts, 24 * 60 * 60 * 1000);
-
-  // Pulisci l'intervallo quando il componente viene smontato
-  return () => clearInterval(cleanupInterval);
+  let cleanupAttempted = false;
+  const tryCleanup = async () => {
+    if (!cleanupAttempted) {
+      cleanupAttempted = true;
+      try {
+        await cleanupOldDrafts();
+      } catch (e) {
+        // Se fallisce, non riprovare più
+        console.warn('Pulizia draft fallita, non verrà ripetuta:', e);
+      }
+    }
+  };
+  tryCleanup();
 }, []);
 
 // Se vuoi una funzione che può essere chiamata manualmente
@@ -1323,13 +1328,19 @@ const resetCurrentTimer = () => {
     dispatch({ type: ACTIONS.CONFIRM_SELECTION });
     
     // Passa al prossimo passaggio
-    dispatch({ 
-      type: ACTIONS.MOVE_TO_NEXT_STEP,
-      payload: {
-        timePerBan: state.settings.timePerBan,
-        timePerPick: state.settings.timePerPick
-      }
-    });
+    // Se siamo all'ultimo step, termina il draft
+    if (state.currentStepIndex >= state.draftSequence.length - 1) {
+      dispatch({ type: ACTIONS.COMPLETE_DRAFT });
+    } else {
+      // Passa al prossimo passaggio
+      dispatch({ 
+        type: ACTIONS.MOVE_TO_NEXT_STEP,
+        payload: {
+          timePerBan: state.settings.timePerBan,
+          timePerPick: state.settings.timePerPick
+        }
+      });
+    }
   };
 
   // Verifica se un campione è selezionabile

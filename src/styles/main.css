@@ -1219,17 +1219,36 @@ body {
   text-wrap-mode: nowrap;
 }
 
-@keyframes pulse {
-  0% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.05);
-  }
-  100% {
-    transform: scale(1);
-  }
+/* Fix: il timer countdown resta bianco */
+.timer-content {
+  color: var(--text) !important;
 }
+.timer-content .fa-clock.team-blue {
+  color: var(--blue-team) !important;
+}
+.timer-content .fa-clock.team-red {
+  color: var(--red-team) !important;
+}
+.ban-pick-text.team-blue {
+  color: var(--blue-team) !important;
+}
+.ban-pick-text.team-red {
+  color: var(--red-team) !important;
+}
+/* Neutro (bianco) se nonStarted, completed o nessun team */
+.timer-content .fa-clock.team-undefined,
+.timer-content .fa-clock.team-null,
+.timer-content .fa-clock.team-coinFlip,
+.timer-content .fa-clock.team- {
+  color: var(--text) !important;
+}
+.ban-pick-text.team-undefined,
+.ban-pick-text.team-null,
+.ban-pick-text.team-coinFlip,
+.ban-pick-text.team- {
+  color: var(--text) !important;
+}
+
 /* OVERRIDES */
 
 div.text-muted{

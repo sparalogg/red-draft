@@ -1,243 +1,154 @@
+
+// Nuova funzione modulare per generare la sequenza draft
 export function generateDraftSequence({
   numberOfBans,
   teamNames,
   startingTeam = null
 }) {
-  /*console.log('Generazione sequenza draft:', {
-    numberOfBans,
-    teamNames,
-    startingTeam
-  });*/
-
-  // Se non è specificato un team iniziale, usa il lancio moneta
+  // Determina il team vincente e perdente (winner/loser)
+  // Se non specificato, random
+  let winner = startingTeam;
+  let loser = startingTeam === 'blue' ? 'red' : 'blue';
   if (!startingTeam) {
-    startingTeam = Math.random() < 0.5 ? 'blue' : 'red';
+    winner = Math.random() < 0.5 ? 'blue' : 'red';
+    loser = winner === 'blue' ? 'red' : 'blue';
   }
 
-  // Se startingTeam è 'red', inverti completamente la sequenza standard
-  const isReversed = startingTeam === 'red';
+  // Helper per creare step
+  const createStep = ({ type, team, slot, phase, multiSelect = false, selectCount = 1, additionalSlots = [] }) => ({
+    type,
+    team,
+    slot,
+    phase,
+    multiSelect,
+    selectCount,
+    ...(additionalSlots.length > 0 ? { additionalSlots } : {})
+  });
 
-  // Definisci la sequenza base per i ban
-  const createBanSequence = (team1, team2) => {
-    let banSequence = [];
-    
-    // Determina il numero di ban per fase
-    let firstBanCount = 0;
-    let secondBanCount = 0;
+  let sequence = [];
 
-    switch (parseInt(numberOfBans)) {
-      case 1:
-        firstBanCount = 1;
-        secondBanCount = 0;
-        break;
-      case 2:
-        firstBanCount = 1;
-        secondBanCount = 1;
-        break;
-      case 3:
-        firstBanCount = 1;
-        secondBanCount = 2;
-        break;
-      case 4:
-        firstBanCount = 2;
-        secondBanCount = 2;
-        break;
-      default:
-        firstBanCount = 1;
-        secondBanCount = 1;
-    }
-
+  // --- LOGICA GENERICA PER 1, 2, 3, 4 BAN ---
+  const bans = parseInt(numberOfBans);
+  if (bans === 3) {
+    // 3 BAN: sequenza custom robusta
+    // Prima fase di ban: winner, loser, winner, loser
+    sequence.push(
+      createStep({ type: 'ban', team: winner, slot: `${winner}Ban1`, phase: `Ban 1 - ${teamNames[winner]} (Winner)` }),
+      createStep({ type: 'ban', team: loser, slot: `${loser}Ban1`, phase: `Ban 1 - ${teamNames[loser]} (Loser)` }),
+      createStep({ type: 'ban', team: winner, slot: `${winner}Ban2`, phase: `Ban 2 - ${teamNames[winner]} (Winner)` }),
+      createStep({ type: 'ban', team: loser, slot: `${loser}Ban2`, phase: `Ban 2 - ${teamNames[loser]} (Loser)` })
+    );
+    // Prima fase pick: 1-2-2-1
+    sequence.push(
+      createStep({ type: 'pick', team: winner, slot: `${winner}Player1`, phase: `Pick - ${teamNames[winner]} (Winner)` }),
+      createStep({ type: 'pick', team: loser, slot: `${loser}Player1`, phase: `Pick (2) - ${teamNames[loser]} (Loser)`, multiSelect: true, selectCount: 2, additionalSlots: [`${loser}Player2`] }),
+      createStep({ type: 'pick', team: winner, slot: `${winner}Player2`, phase: `Pick (2) - ${teamNames[winner]} (Winner)`, multiSelect: true, selectCount: 2, additionalSlots: [`${winner}Player3`] }),
+      createStep({ type: 'pick', team: loser, slot: `${loser}Player3`, phase: `Pick - ${teamNames[loser]} (Loser)` })
+    );
+    // Seconda fase di ban: winner, loser
+    sequence.push(
+      createStep({ type: 'ban', team: winner, slot: `${winner}Ban3`, phase: `Ban 3 - ${teamNames[winner]} (Winner)` }),
+      createStep({ type: 'ban', team: loser, slot: `${loser}Ban3`, phase: `Ban 3 - ${teamNames[loser]} (Loser)` })
+    );
+    // Seconda fase pick: 1-2-1
+    sequence.push(
+      createStep({ type: 'pick', team: loser, slot: `${loser}Player4`, phase: `Pick - ${teamNames[loser]} (Loser)` }),
+      createStep({ type: 'pick', team: winner, slot: `${winner}Player4`, phase: `Pick (2) - ${teamNames[winner]} (Winner)`, multiSelect: true, selectCount: 2, additionalSlots: [`${winner}Player5`] }),
+      createStep({ type: 'pick', team: loser, slot: `${loser}Player5`, phase: `Pick - ${teamNames[loser]} (Loser)` })
+    );
+    return sequence;
+  }
+  if (bans === 1) {
+    // 1 BAN: solo una fase di ban (winner, loser), poi solo pick alternati (5 per team)
+    sequence.push(
+      createStep({ type: 'ban', team: winner, slot: `${winner}Ban1`, phase: `Ban 1 - ${teamNames[winner]} (Winner)` }),
+      createStep({ type: 'ban', team: loser, slot: `${loser}Ban1`, phase: `Ban 1 - ${teamNames[loser]} (Loser)` })
+    );
+    // Pick alternati: winner, loser, loser, winner, winner, loser, loser, winner, winner, loser
+    sequence.push(
+      createStep({ type: 'pick', team: winner, slot: `${winner}Player1`, phase: `Pick - ${teamNames[winner]} (Winner)` }),
+      createStep({ type: 'pick', team: loser, slot: `${loser}Player1`, phase: `Pick - ${teamNames[loser]} (Loser)` }),
+      createStep({ type: 'pick', team: loser, slot: `${loser}Player2`, phase: `Pick - ${teamNames[loser]} (Loser)` }),
+      createStep({ type: 'pick', team: winner, slot: `${winner}Player2`, phase: `Pick - ${teamNames[winner]} (Winner)` }),
+      createStep({ type: 'pick', team: winner, slot: `${winner}Player3`, phase: `Pick - ${teamNames[winner]} (Winner)` }),
+      createStep({ type: 'pick', team: loser, slot: `${loser}Player3`, phase: `Pick - ${teamNames[loser]} (Loser)` }),
+      createStep({ type: 'pick', team: loser, slot: `${loser}Player4`, phase: `Pick - ${teamNames[loser]} (Loser)` }),
+      createStep({ type: 'pick', team: winner, slot: `${winner}Player4`, phase: `Pick - ${teamNames[winner]} (Winner)` }),
+      createStep({ type: 'pick', team: winner, slot: `${winner}Player5`, phase: `Pick - ${teamNames[winner]} (Winner)` }),
+      createStep({ type: 'pick', team: loser, slot: `${loser}Player5`, phase: `Pick - ${teamNames[loser]} (Loser)` })
+    );
+    return sequence;
+  }
+  if (bans === 2) {
+    // 2 BAN: due fasi di ban, in ciascuna winner e loser fanno 1 ban
+    sequence.push(
+      createStep({ type: 'ban', team: winner, slot: `${winner}Ban1`, phase: `Ban 1 - ${teamNames[winner]} (Winner)` }),
+      createStep({ type: 'ban', team: loser, slot: `${loser}Ban1`, phase: `Ban 1 - ${teamNames[loser]} (Loser)` })
+    );
+    // Pick alternati: winner, loser, loser, winner, winner, loser, loser, winner, winner, loser
+    sequence.push(
+      createStep({ type: 'pick', team: winner, slot: `${winner}Player1`, phase: `Pick - ${teamNames[winner]} (Winner)` }),
+      createStep({ type: 'pick', team: loser, slot: `${loser}Player1`, phase: `Pick - ${teamNames[loser]} (Loser)` }),
+      createStep({ type: 'pick', team: loser, slot: `${loser}Player2`, phase: `Pick - ${teamNames[loser]} (Loser)` }),
+      createStep({ type: 'pick', team: winner, slot: `${winner}Player2`, phase: `Pick - ${teamNames[winner]} (Winner)` }),
+      createStep({ type: 'pick', team: winner, slot: `${winner}Player3`, phase: `Pick - ${teamNames[winner]} (Winner)` }),
+      createStep({ type: 'pick', team: loser, slot: `${loser}Player3`, phase: `Pick - ${teamNames[loser]} (Loser)` })
+    );
+    // Seconda fase di ban
+    sequence.push(
+      createStep({ type: 'ban', team: winner, slot: `${winner}Ban2`, phase: `Ban 2 - ${teamNames[winner]} (Winner)` }),
+      createStep({ type: 'ban', team: loser, slot: `${loser}Ban2`, phase: `Ban 2 - ${teamNames[loser]} (Loser)` })
+    );
+    // Ultimi pick
+    sequence.push(
+      createStep({ type: 'pick', team: loser, slot: `${loser}Player4`, phase: `Pick - ${teamNames[loser]} (Loser)` }),
+      createStep({ type: 'pick', team: winner, slot: `${winner}Player4`, phase: `Pick - ${teamNames[winner]} (Winner)` }),
+      createStep({ type: 'pick', team: winner, slot: `${winner}Player5`, phase: `Pick - ${teamNames[winner]} (Winner)` }),
+      createStep({ type: 'pick', team: loser, slot: `${loser}Player5`, phase: `Pick - ${teamNames[loser]} (Loser)` })
+    );
+    return sequence;
+  }
+  if (bans === 4) {
+    // 4 BAN: due fasi di ban, in ciascuna winner e loser fanno 2 ban alternati
     // Prima fase di ban
-    if (firstBanCount === 1) {
-      banSequence.push(
-        {
-          type: 'ban',
-          team: team1,
-          slot: `${team1}Ban1`,
-          phase: `Ban - ${teamNames[team1]} Team`,
-          multiSelect: false,
-          selectCount: 1
-        },
-        {
-          type: 'ban',
-          team: team2,
-          slot: `${team2}Ban1`,
-          phase: `Ban - ${teamNames[team2]} Team`,
-          multiSelect: false,
-          selectCount: 1
-        }
-      );
-    } else if (firstBanCount === 2) {
-      banSequence.push(
-        {
-          type: 'ban',
-          team: team1,
-          slot: `${team1}Ban1`,
-          phase: `Ban (2) - ${teamNames[team1]} Team`,
-          multiSelect: true,
-          selectCount: 2,
-          additionalSlots: [`${team1}Ban2`]
-        },
-        {
-          type: 'ban',
-          team: team2,
-          slot: `${team2}Ban1`,
-          phase: `Ban (2) - ${teamNames[team2]} Team`,
-          multiSelect: true,
-          selectCount: 2,
-          additionalSlots: [`${team2}Ban2`]
-        }
-      );
-    }
+    sequence.push(
+      createStep({ type: 'ban', team: winner, slot: `${winner}Ban1`, phase: `Ban 1 - ${teamNames[winner]} (Winner)` }),
+      createStep({ type: 'ban', team: loser, slot: `${loser}Ban1`, phase: `Ban 1 - ${teamNames[loser]} (Loser)` }),
+      createStep({ type: 'ban', team: winner, slot: `${winner}Ban2`, phase: `Ban 2 - ${teamNames[winner]} (Winner)` }),
+      createStep({ type: 'ban', team: loser, slot: `${loser}Ban2`, phase: `Ban 2 - ${teamNames[loser]} (Loser)` })
+    );
+    // Pick alternati: winner, loser, loser, winner, winner, loser, loser, winner, winner, loser
+    sequence.push(
+      createStep({ type: 'pick', team: winner, slot: `${winner}Player1`, phase: `Pick - ${teamNames[winner]} (Winner)` }),
+      createStep({ type: 'pick', team: loser, slot: `${loser}Player1`, phase: `Pick - ${teamNames[loser]} (Loser)` }),
+      createStep({ type: 'pick', team: loser, slot: `${loser}Player2`, phase: `Pick - ${teamNames[loser]} (Loser)` }),
+      createStep({ type: 'pick', team: winner, slot: `${winner}Player2`, phase: `Pick - ${teamNames[winner]} (Winner)` }),
+      createStep({ type: 'pick', team: winner, slot: `${winner}Player3`, phase: `Pick - ${teamNames[winner]} (Winner)` })
+    );
+    // Seconda fase di ban
+    sequence.push(
+      createStep({ type: 'ban', team: winner, slot: `${winner}Ban3`, phase: `Ban 3 - ${teamNames[winner]} (Winner)` }),
+      createStep({ type: 'ban', team: loser, slot: `${loser}Ban3`, phase: `Ban 3 - ${teamNames[loser]} (Loser)` }),
+      createStep({ type: 'ban', team: winner, slot: `${winner}Ban4`, phase: `Ban 4 - ${teamNames[winner]} (Winner)` }),
+      createStep({ type: 'ban', team: loser, slot: `${loser}Ban4`, phase: `Ban 4 - ${teamNames[loser]} (Loser)` })
+    );
+    // Ultimi pick
+    sequence.push(
+      createStep({ type: 'pick', team: loser, slot: `${loser}Player3`, phase: `Pick - ${teamNames[loser]} (Loser)` }),
+      createStep({ type: 'pick', team: loser, slot: `${loser}Player4`, phase: `Pick - ${teamNames[loser]} (Loser)` }),
+      createStep({ type: 'pick', team: winner, slot: `${winner}Player4`, phase: `Pick - ${teamNames[winner]} (Winner)` }),
+      createStep({ type: 'pick', team: winner, slot: `${winner}Player5`, phase: `Pick - ${teamNames[winner]} (Winner)` }),
+      createStep({ type: 'pick', team: loser, slot: `${loser}Player5`, phase: `Pick - ${teamNames[loser]} (Loser)` })
+    );
+    return sequence;
+  }
 
-    return banSequence;
-  };
-
-  // Funzione per creare la sequenza di pick
-  const createPickSequence = (team1, team2) => {
-    return [
-      // Blue seleziona primo eroe
-      {
-        type: 'pick',
-        team: team1,
-        slot: `${team1}Player1`,
-        phase: `Pick - ${teamNames[team1]} Team`,
-        multiSelect: false,
-        selectCount: 1
-      },
-      // Red seleziona due eroi
-      {
-        type: 'pick',
-        team: team2,
-        slot: `${team2}Player1`,
-        phase: `Pick (2) - ${teamNames[team2]} Team`,
-        multiSelect: true,
-        selectCount: 2,
-        additionalSlots: [`${team2}Player2`]
-      },
-      // Blue seleziona due eroi
-      {
-        type: 'pick',
-        team: team1,
-        slot: `${team1}Player2`,
-        phase: `Pick (2) - ${teamNames[team1]} Team`,
-        multiSelect: true,
-        selectCount: 2,
-        additionalSlots: [`${team1}Player3`]
-      },
-      // Red seleziona un eroe
-      {
-        type: 'pick',
-        team: team2,
-        slot: `${team2}Player3`,
-        phase: `Pick - ${teamNames[team2]} Team`,
-        multiSelect: false,
-        selectCount: 1
-      }
-    ];
-  };
-
-  // Seconda fase di ban
-  const createSecondBanSequence = (team1, team2) => {
-    let secondBanSequence = [];
-    
-    let secondBanCount = 0;
-    switch (parseInt(numberOfBans)) {
-      case 3: secondBanCount = 2; break;
-      case 4: secondBanCount = 2; break;
-      default: secondBanCount = 1;
-    }
-
-    if (secondBanCount === 1) {
-      secondBanSequence.push(
-        {
-          type: 'ban',
-          team: team2,
-          slot: `${team2}Ban2`,
-          phase: `Secondary Ban - ${teamNames[team2]} Team`,
-          multiSelect: false,
-          selectCount: 1
-        },
-        {
-          type: 'ban',
-          team: team1,
-          slot: `${team1}Ban2`,
-          phase: `Secondary Ban - ${teamNames[team1]} Team`,
-          multiSelect: false,
-          selectCount: 1
-        }
-      );
-    } else if (secondBanCount === 2) {
-      secondBanSequence.push(
-        {
-          type: 'ban',
-          team: team2,
-          slot: `${team2}Ban2`,
-          phase: `Secondary Ban (2) - ${teamNames[team2]} Team`,
-          multiSelect: true,
-          selectCount: 2,
-          additionalSlots: [`${team2}Ban3`]
-        },
-        {
-          type: 'ban',
-          team: team1,
-          slot: `${team1}Ban2`,
-          phase: `Secondary Ban (2) - ${teamNames[team1]} Team`,
-          multiSelect: true,
-          selectCount: 2,
-          additionalSlots: [`${team1}Ban3`]
-        }
-      );
-    }
-
-    return secondBanSequence;
-  };
-
-  // Ultima fase di pick
-  const createFinalPickSequence = (team1, team2) => {
-    return [
-      // Red seleziona un eroe
-      {
-        type: 'pick',
-        team: team2,
-        slot: `${team2}Player4`,
-        phase: `Pick - ${teamNames[team2]} Team`,
-        multiSelect: false,
-        selectCount: 1
-      },
-      // Blue seleziona due eroi
-      {
-        type: 'pick',
-        team: team1,
-        slot: `${team1}Player4`,
-        phase: `Pick (2) - ${teamNames[team1]} Team`,
-        multiSelect: true,
-        selectCount: 2,
-        additionalSlots: [`${team1}Player5`]
-      },
-      // Red seleziona l'ultimo eroe
-      {
-        type: 'pick',
-        team: team2,
-        slot: `${team2}Player5`,
-        phase: `Pick - ${teamNames[team2]} Team`,
-        multiSelect: false,
-        selectCount: 1
-      }
-    ];
-  };
-
-  // Determina l'ordine dei team
-  const [team1, team2] = isReversed ? ['red', 'blue'] : ['blue', 'red'];
-
-  // Costruisci la sequenza completa
-  const sequence = [
-    ...createBanSequence(team1, team2),
-    ...createPickSequence(team1, team2),
-    ...createSecondBanSequence(team1, team2),
-    ...createFinalPickSequence(team1, team2)
-  ];
-
-  //console.log("Generated sequence:", sequence);
+  // Fallback: sequenza base
+  sequence.push(
+    createStep({ type: 'ban', team: 'blue', slot: `blueBan1`, phase: `Ban 1 - ${teamNames['blue']}` }),
+    createStep({ type: 'ban', team: 'red', slot: `redBan1`, phase: `Ban 1 - ${teamNames['red']}` }),
+    createStep({ type: 'pick', team: 'blue', slot: `bluePlayer1`, phase: `Pick 1 - ${teamNames['blue']}` }),
+    createStep({ type: 'pick', team: 'red', slot: `redPlayer1`, phase: `Pick 1 - ${teamNames['red']}` })
+  );
   return sequence;
 }
